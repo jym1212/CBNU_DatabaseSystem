@@ -22,6 +22,7 @@ public class mysql {
         }
     }
 
+    //Book 테이블 내 모든 데이터 검색
     public static void selectAllBook() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -33,8 +34,8 @@ public class mysql {
 
             System.out.println("SELECT * FROM Book;\n");
             while (rs.next()) {
-                System.out
-                        .println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3) + " " + rs.getString(4));
+                System.out.println(rs.getInt(1) + ", " + rs.getString(2) + ", " +
+                        rs.getString(3) + ", " + rs.getString(4));
             }
             System.out.println("\n");
 
@@ -45,6 +46,7 @@ public class mysql {
         }
     }
     
+    //Book 테이블 내 특정 데이터 검색
     public static void selectBook(int bookid) {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -56,8 +58,8 @@ public class mysql {
 
             System.out.println("SELECT * FROM Book WHERE bookid = " + bookid + ";");
             while (rs.next()) {
-                System.out
-                        .println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3) + " " + rs.getString(4));
+                System.out.println(rs.getInt(1) + ", " + rs.getString(2) + ", " +
+                        rs.getString(3) + ", " + rs.getString(4));
             }
             System.out.println("\n");
             
@@ -68,6 +70,7 @@ public class mysql {
         }
     }
     
+    //Book 테이블 내 데이터 삽입
     public static void insertBook(int bookid, String bookname, String publisher, int price) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -81,8 +84,9 @@ public class mysql {
             pstmt.setString(2, bookname);
             pstmt.setString(3, publisher);
             pstmt.setInt(4, price);
-            
-            System.out.println("INSERT INTO Book (bookid, bookname, publisher, price)\nVALUES (" + bookid + ", " + bookname + ", " + publisher + ", " + price + ");");
+
+            System.out.println("INSERT INTO Book (bookid, bookname, publisher, price)\nVALUES ("
+                    + bookid + ", " + bookname + ", " + publisher + ", " + price + ");");
             int rowsCount = pstmt.executeUpdate();
             System.out.println(rowsCount + " row(s) in set\n");
 
@@ -91,6 +95,7 @@ public class mysql {
         }
     }
     
+    //Book 테이블 내 데이터 삭제
     public static void deleteBook(int bookid) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
