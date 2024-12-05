@@ -21,6 +21,7 @@ public class professor {
 
             switch (menu) {
                 case 1:
+                    selectALLProfessor(con);
                     break;
                 case 2:
                     insertProfessor(con, sc);
@@ -39,6 +40,45 @@ public class professor {
         }
         int padding = length - realLength;
         return str + " ".repeat(Math.max(0, padding));
+    }
+
+    // 전체 교수님 목록 출력 함수
+    public static void selectALLProfessor(Connection con) {
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Professor ORDER BY prof_id ASC;");
+
+            System.out.print("\n---------------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s |\n",
+                        formatString("교수님 아이디", 12),
+                        formatString("교수님 성함", 10),
+                        formatString("이메일", 30),
+                        formatString("랩실 이름", 20),
+                        formatString("랩실 호수", 6));
+            System.out.println("---------------------------------------------------------------------------------------------------");
+            while (rs.next()) {
+                String prof_id = formatString(rs.getString(1), 13);
+                String prof_name = formatString(rs.getString(2), 11);
+                String email = formatString(rs.getString(3), 30);
+                String lab_name = formatString(rs.getString(4), 20);
+                String lab_num = formatString(rs.getString(5), 9);
+                System.out.printf("| %s | %s | %s | %s | %s |\n", prof_id, prof_name, email, lab_name, lab_num);
+            }
+            System.out.println("---------------------------------------------------------------------------------------------------");
+
+            stmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+            System.out.println(">> SQL State : " + e.getSQLState());
+            System.out.println(">> Error Code : " + e.getErrorCode());
+            
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
     }
     
     // 교수님 추가 함수
