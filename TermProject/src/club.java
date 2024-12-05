@@ -27,6 +27,9 @@ public class club {
                 case 2:
                     insertClub(con, sc);
                     break;
+                case 4:
+                    deleteClub(con, sc);
+                    break;
                 case 7:
                     return;
             }
@@ -49,9 +52,9 @@ public class club {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM Club;");
 
-            System.out.print("\n--------------------------------------------------------\n");
+            System.out.print("\n---------------------------------------------------------\n");
             System.out.println("| 동아리 코드 | 동아리 이름 | 동아리 호수 | 동아리 인원 |");
-            System.out.println("--------------------------------------------------------");
+            System.out.println("---------------------------------------------------------");
             while (rs.next()) {
                 String clubId = formatString(rs.getString(1), 12);
                 String clubName = formatString(rs.getString(2), 12);
@@ -63,15 +66,15 @@ public class club {
 
             stmt.close();
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("SQL 문법 오류 : " + e.getMessage());
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
             
         } catch (SQLException e) {
-            System.out.println("데이터베이스 조회 오류 : " + e.getMessage());
-            System.out.println("SQL State : " + e.getSQLState());
-            System.out.println("Error Code : " + e.getErrorCode());
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+            System.out.println(">> SQL State : " + e.getSQLState());
+            System.out.println(">> Error Code : " + e.getErrorCode());
             
         } catch (Exception e) {
-            System.out.println("예상치 못한 오류 : " + e.getMessage());
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
     }
 
@@ -94,7 +97,6 @@ public class club {
             pstmt.setInt(3, room_num);
             pstmt.setInt(4, total_num);
 
-            
             pstmt.executeUpdate();
             System.out.println(">> Club 테이블에 데이터를 성공적으로 삽입했습니다.");
 
@@ -110,6 +112,31 @@ public class club {
                 System.out.println(">> Error Code : " + e.getErrorCode());
             }
 
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 동아리 삭제 함수
+    public static void deleteClub(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n동아리 코드 : ");
+            int club_id = sc.nextInt();
+
+            String query = "DELETE FROM Club WHERE club_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, club_id);
+
+            pstmt.executeUpdate();
+            System.out.println(">> Club 테이블에 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
+            if (e.getSQLState() != null) {
+                System.out.println(">> SQL State : " + e.getSQLState());
+                System.out.println(">> Error Code : " + e.getErrorCode());
+            }
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
