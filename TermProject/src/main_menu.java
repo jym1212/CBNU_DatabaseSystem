@@ -78,27 +78,27 @@ public class main_menu {
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS ClubManagement");
             stmt.executeUpdate("USE ClubManagement");
             stmt.executeUpdate(
-                    "CREATE TABLE Professor (prof_id VARCHAR(10) PRIMARY KEY, prof_name VARCHAR(20), email VARCHAR(30), lab_name VARCHAR(20), lab_num INT)");
+                    "CREATE TABLE IF NOT EXISTS Professor (prof_id VARCHAR(10) NOT NULL PRIMARY KEY, prof_name VARCHAR(20) NOT NULL, email VARCHAR(30), lab_name VARCHAR(20), lab_num INT)");
             stmt.executeUpdate(
-                    "CREATE TABLE Club (club_id INT AUTO_INCREMENT PRIMARY KEY, club_name VARCHAR(20), room_num INT, total_num INT, prof_id VARCHAR(10), FOREIGN KEY (prof_id) REFERENCES Professor(prof_id))");
+                    "CREATE TABLE IF NOT EXISTS Club (club_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, club_name VARCHAR(20) NOT NULL, room_num INT, total_num INT, prof_id VARCHAR(10), FOREIGN KEY (prof_id) REFERENCES Professor(prof_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE Student (stu_id VARCHAR(10) PRIMARY KEY, stu_name VARCHAR(10), phone VARCHAR(15), state VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Student (stu_id VARCHAR(10) NOT NULL PRIMARY KEY, stu_name VARCHAR(10) NOT NULL, phone VARCHAR(15), state VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE StuDept (stu_id VARCHAR(10) PRIMARY KEY, dept VARCHAR(20), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
+                    "CREATE TABLE IF NOT EXISTS StuDept (stu_id VARCHAR(10) NOT NULL PRIMARY KEY, dept VARCHAR(20) NOT NULL, FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE Manager (man_id VARCHAR(10) PRIMARY KEY, man_name VARCHAR(10), phone VARCHAR(15), position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Manager (man_id VARCHAR(10) NOT NULL PRIMARY KEY, man_name VARCHAR(10) NOT NULL, phone VARCHAR(15), position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE ManDept (man_id VARCHAR(10) PRIMARY KEY, dept VARCHAR(20), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
+                    "CREATE TABLE IF NOT EXISTS ManDept (man_id VARCHAR(10) NOT NULL PRIMARY KEY, dept VARCHAR(20) NOT NULL, FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE Event (event_id INT AUTO_INCREMENT PRIMARY KEY, event_name VARCHAR(20), event_date DATE, host VARCHAR(10))");
+                    "CREATE TABLE IF NOT EXISTS Event (event_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, host VARCHAR(10))");
             stmt.executeUpdate(
-                    "CREATE TABLE Project (project_id INT AUTO_INCREMENT PRIMARY KEY, project_name VARCHAR(30), project_date DATE, host VARCHAR(10))");
+                    "CREATE TABLE IF NOT EXISTS Project (project_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, host VARCHAR(10))");
             stmt.executeUpdate(
-                    "CREATE TABLE Item (item_id INT AUTO_INCREMENT PRIMARY KEY, item_name VARCHAR(20), item_date DATE, total_num INT, man_id VARCHAR(10), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
+                    "CREATE TABLE IF NOT EXISTS Item (item_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, item_name VARCHAR(20) NOT NULL, item_date DATE, total_num INT, man_id VARCHAR(10), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE Participate (stu_id VARCHAR(10), event_id INT, PRIMARY KEY (stu_id, event_id), total_num INT, FOREIGN KEY (stu_id) REFERENCES Student(stu_id), FOREIGN KEY (event_id) REFERENCES Event(event_id))");
+                    "CREATE TABLE IF NOT EXISTS Participate (stu_id VARCHAR(10) NOT NULL, event_id INT NOT NULL, PRIMARY KEY (stu_id, event_id), total_num INT, FOREIGN KEY (stu_id) REFERENCES Student(stu_id), FOREIGN KEY (event_id) REFERENCES Event(event_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE Work_On (project_id INT, stu_id VARCHAR(10), PRIMARY KEY (project_id, stu_id), total_num INT, FOREIGN KEY (project_id) REFERENCES Project(project_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
+                    "CREATE TABLE IF NOT EXISTS Work_On (project_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (project_id, stu_id), total_num INT, FOREIGN KEY (project_id) REFERENCES Project(project_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
             stmt.close();
         } catch (Exception e) {
             System.out.println("Database Connection Error: " + e);
