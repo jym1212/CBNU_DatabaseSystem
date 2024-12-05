@@ -26,6 +26,9 @@ public class club {
                 case 2:
                     insertClub(con, sc);
                     break;
+                case 3:
+                    updateClub(con, sc);
+                    break;
                 case 4:
                     deleteClub(con, sc);
                     break;
@@ -67,6 +70,7 @@ public class club {
             System.out.println("---------------------------------------------------------");
 
             stmt.close();
+
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
             
@@ -89,7 +93,7 @@ public class club {
             String club_name = sc.next();
             System.out.print("동아리 호수 : ");
             int room_num = sc.nextInt();
-            System.out.print("동아리 총 인원 : ");
+            System.out.print("동아리 인원 : ");
             int total_num = sc.nextInt();
 
             String query = "INSERT INTO Club (club_id, club_name, room_num, total_num) VALUES (?, ?, ?, ?)";
@@ -105,8 +109,8 @@ public class club {
             pstmt.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
-                    System.out.println(">> 데이터 삽입 실패 : 동아리 코드가 이미 존재합니다.");
-        
+            System.out.println(">> 데이터 삽입 실패 : 동아리 코드가 이미 존재합니다.");
+
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
             if (e.getSQLState() != null) {
@@ -118,11 +122,59 @@ public class club {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
     }
+    
+    // 동아리 수정 함수
+    public static void updateClub(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n수정할 동아리 코드 : ");
+            int club_id = sc.nextInt();
+
+            String query = "SELECT * FROM Club WHERE club_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, club_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 해당 동아리 코드가 존재하지 않습니다.");
+                return;
+            }
+            
+            System.out.print("동아리 이름 : ");
+            String club_name = sc.next();
+            System.out.print("동아리 호수 : ");
+            int room_num = sc.nextInt();
+            System.out.print("동아리 인원 : ");
+            int total_num = sc.nextInt();
+
+            String updateQuery = "UPDATE Club SET club_name = ?, room_num = ?, total_num = ? WHERE club_id = ?";
+            PreparedStatement updatePstmt = con.prepareStatement(updateQuery);
+            updatePstmt.setString(1, club_name);
+            updatePstmt.setInt(2, room_num);
+            updatePstmt.setInt(3, total_num);
+            updatePstmt.setInt(4, club_id);
+
+            updatePstmt.executeUpdate();
+            System.out.println(">> Club 테이블에 데이터를 성공적으로 수정했습니다.");
+
+            pstmt.close();
+            updatePstmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
+            if (e.getSQLState() != null) {
+                System.out.println(">> SQL State : " + e.getSQLState());
+               System.out.println(">> Error Code : " + e.getErrorCode());
+            }
+            
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
 
     // 동아리 삭제 함수
     public static void deleteClub(Connection con, Scanner sc) {
         try {
-            System.out.print("\n동아리 코드 : ");
+            System.out.print("\n삭제할 동아리 코드 : ");
             int club_id = sc.nextInt();
 
             String query = "DELETE FROM Club WHERE club_id = ?";
@@ -133,12 +185,14 @@ public class club {
             System.out.println(">> Club 테이블에 데이터를 성공적으로 삭제했습니다.");
 
             pstmt.close();
+
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
             if (e.getSQLState() != null) {
                 System.out.println(">> SQL State : " + e.getSQLState());
                 System.out.println(">> Error Code : " + e.getErrorCode());
             }
+
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
@@ -147,9 +201,9 @@ public class club {
     // 동아리 검색 함수
     public static void selectClub(Connection con, Scanner sc) {
         try {
-            System.out.print("\n동아리 코드 : ");
+            System.out.print("\n검색할 동아리 코드 : ");
             int club_id = sc.nextInt();
-
+            
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM Club WHERE club_id = " + club_id + ";");
 
