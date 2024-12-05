@@ -32,6 +32,15 @@ public class main_menu {
                         System.out.println("동아리 관리 DB 연결에 실패했습니다.");
                     }
                     break;
+                case 2:
+                    if (con != null) {
+                        club.club_menu(con, sc);
+                    } else {
+                        System.out.println("동아리 관리 DB와 연결되어 있지 않습니다.");
+                        System.out.println("동아리 관리 DB와 먼저 연결해주세요.");
+                    }
+                    break;
+
                 case 9:
                     con = closeConnection(con);
                     if (con == null) {
