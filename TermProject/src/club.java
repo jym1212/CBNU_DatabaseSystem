@@ -14,8 +14,7 @@ public class club {
             System.out.println("3. 동아리 수정");
             System.out.println("4. 동아리 삭제");
             System.out.println("5. 동아리 검색");
-            System.out.println("6. 동아리 정렬");
-            System.out.println("7. 메인 메뉴로 돌아가기");
+            System.out.println("6. 메인 메뉴로 돌아가기");
             System.out.print(">> 메뉴 선택 : ");
 
             menu = sc.nextInt();
@@ -33,7 +32,7 @@ public class club {
                 case 5:
                     selectClub(con, sc);
                     break;
-                case 7:
+                case 6:
                     return;
             }
         }
@@ -53,17 +52,17 @@ public class club {
     public static void selectALLClub(Connection con) {
         try {
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Club;");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Club ORDER BY club_id ASC;");
 
             System.out.print("\n---------------------------------------------------------\n");
             System.out.println("| 동아리 코드 | 동아리 이름 | 동아리 호수 | 동아리 인원 |");
             System.out.println("---------------------------------------------------------");
             while (rs.next()) {
-                String clubId = formatString(rs.getString(1), 12);
-                String clubName = formatString(rs.getString(2), 12);
-                String roomNum = formatString(rs.getString(3), 12);
-                String totalNum = formatString(rs.getString(4), 12);
-                System.out.printf("| %s| %s| %s| %s|\n", clubId, clubName, roomNum, totalNum);
+                String club_id = formatString(rs.getString(1), 12);
+                String club_name = formatString(rs.getString(2), 12);
+                String room_num = formatString(rs.getString(3), 12);
+                String total_mum = formatString(rs.getString(4), 12);
+                System.out.printf("| %s| %s| %s| %s|\n", club_id, club_name, room_num, total_mum);
             }
             System.out.println("---------------------------------------------------------");
 
