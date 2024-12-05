@@ -26,6 +26,9 @@ public class professor {
                 case 2:
                     insertProfessor(con, sc);
                     break;
+                case 4:
+                    deleteProfessor(con, sc);
+                    break;
                 case 6:
                     return;
             }
@@ -101,7 +104,7 @@ public class professor {
             pstmt.setString(2, prof_name);
             pstmt.setString(3, email);
             pstmt.setString(4, lab_name);
-            pstmt.setInt(5, lab_num);   
+            pstmt.setInt(5, lab_num);
 
             pstmt.executeUpdate();
             System.out.println(">> Professor 테이블에 데이터를 성공적으로 삽입했습니다.");
@@ -113,6 +116,33 @@ public class professor {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
+            if (e.getSQLState() != null) {
+                System.out.println(">> SQL State : " + e.getSQLState());
+                System.out.println(">> Error Code : " + e.getErrorCode());
+            }
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 교수님 삭제 함수
+    public static void deleteProfessor(Connection con, Scanner sc) {     
+        try {
+            System.out.print("\n삭제할 교수님 아이디 : ");
+            int prof_id = sc.nextInt();
+
+            String query = "DELETE FROM Professor WHERE prof_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, prof_id);
+
+            pstmt.executeUpdate();
+            System.out.println(">> Professor 테이블에 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
             if (e.getSQLState() != null) {
                 System.out.println(">> SQL State : " + e.getSQLState());
                 System.out.println(">> Error Code : " + e.getErrorCode());
