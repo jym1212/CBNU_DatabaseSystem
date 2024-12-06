@@ -63,22 +63,24 @@ public class club {
                 return;
             }
 
-            System.out.print("\n-------------------------------------------------------------\n");
-            System.out.printf("| %s | %s | %s | %s |\n",
+            System.out.print("\n----------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s |\n",
                         formatString("동아리 코드", 12),
                         formatString("동아리 이름", 12),
                         formatString("동아리 호수", 12),
-                        formatString("동아리 인원", 12));
-            System.out.println("-------------------------------------------------------------");
+                        formatString("동아리 인원", 12),
+                        formatString("교수님 번호", 12));
+            System.out.println("---------------------------------------------------------------------------");
             
             do {
                 String club_id = formatString(rs.getString(1), 12);
                 String club_name = formatString(rs.getString(2), 12);
                 String room_num = formatString(rs.getString(3), 12);
                 String total_mum = formatString(rs.getString(4), 12);
-                System.out.printf("| %s | %s | %s | %s |\n", club_id, club_name, room_num, total_mum);
+                String prof_id = formatString(rs.getString(5), 12);
+                System.out.printf("| %s | %s | %s | %s | %s |\n", club_id, club_name, room_num, total_mum, prof_id);
             } while (rs.next());
-            System.out.println("-------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------------");
 
             stmt.close();
 
@@ -105,17 +107,37 @@ public class club {
             System.out.print("동아리 인원 : ");
             int total_num = sc.nextInt();
 
-            String query = "INSERT INTO Club (club_id, club_name, room_num, total_num) VALUES (?, ?, ?, ?)";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setInt(1, club_id);
-            pstmt.setString(2, club_name);
-            pstmt.setInt(3, room_num);
-            pstmt.setInt(4, total_num);
+            System.out.print("교수님 번호 : ");
+            String prof_id = sc.next();
+            String valid_id = null;
 
-            pstmt.executeUpdate();
+            String query = "SELECT prof_id FROM Professor WHERE prof_id = ?;";
+            try (PreparedStatement pstmt = con.prepareStatement(query)) {
+                pstmt.setString(1, prof_id);
+                ResultSet rs = pstmt.executeQuery();
+                if (!rs.next()) {
+                    System.out.println(">> 데이터 삽입 실패 : 교수님 번호가 존재하지 않습니다.");
+                    pstmt.close();
+                    return;
+                }
+                else {
+                    valid_id = prof_id;
+                    pstmt.close();
+                }
+            }
+
+            String insertQuery = "INSERT INTO Club (club_id, club_name, room_num, total_num, prof_id) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+            insertPstmt.setInt(1, club_id);
+            insertPstmt.setString(2, club_name);
+            insertPstmt.setInt(3, room_num);
+            insertPstmt.setInt(4, total_num);
+            insertPstmt.setString(5, valid_id);
+
+            insertPstmt.executeUpdate();
             System.out.println(">> Club 테이블에 데이터를 성공적으로 삽입했습니다.");
 
-            pstmt.close();
+            insertPstmt.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println(">> 데이터 삽입 실패 : 동아리 코드가 이미 존재합니다.");
