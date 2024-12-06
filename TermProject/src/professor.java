@@ -29,6 +29,8 @@ public class professor {
                 case 4:
                     deleteProfessor(con, sc);
                     break;
+                case 5:
+                    selectProfessor(con, sc);
                 case 6:
                     return;
             }
@@ -127,7 +129,7 @@ public class professor {
     }
 
     // 교수님 삭제 함수
-    public static void deleteProfessor(Connection con, Scanner sc) {     
+    public static void deleteProfessor(Connection con, Scanner sc) {
         try {
             System.out.print("\n삭제할 교수님 아이디 : ");
             int prof_id = sc.nextInt();
@@ -147,6 +149,49 @@ public class professor {
                 System.out.println(">> SQL State : " + e.getSQLState());
                 System.out.println(">> Error Code : " + e.getErrorCode());
             }
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 교수님 검색 함수
+    public static void selectProfessor(Connection con, Scanner sc) {
+        try {
+            System.out.print("검색할 교수님 아이디 : ");
+            String search_prof_id = sc.next();
+
+            String query = "SELECT * FROM Professor WHERE prof_id = " + search_prof_id + ";";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            
+            System.out.print("\n---------------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s |\n",
+                        formatString("교수님 아이디", 12),
+                        formatString("교수님 성함", 10),
+                        formatString("이메일", 30),
+                        formatString("랩실 이름", 20),
+                        formatString("랩실 호수", 6));
+            System.out.println("---------------------------------------------------------------------------------------------------");
+            while (rs.next()) {
+                String prof_id = formatString(rs.getString(1), 13);
+                String prof_name = formatString(rs.getString(2), 11);
+                String email = formatString(rs.getString(3), 30);
+                String lab_name = formatString(rs.getString(4), 20);
+                String lab_num = formatString(rs.getString(5), 9);
+                System.out.printf("| %s | %s | %s | %s | %s |\n", prof_id, prof_name, email, lab_name, lab_num);
+            }
+            System.out.println("---------------------------------------------------------------------------------------------------");
+
+            stmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+            System.out.println(">> SQL State : " + e.getSQLState());
+            System.out.println(">> Error Code : " + e.getErrorCode());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
