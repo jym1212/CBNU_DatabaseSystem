@@ -65,27 +65,29 @@ public class student {
                 return;
             }
 
-            System.out.print("\n-------------------------------------------------------------------------------\n");
-            System.out.printf("| %s | %s | %s | %s | %s | %s |\n",
+            System.out.print("\n------------------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n",
                         formatString("학생 번호", 13),
                         formatString("학생 이름", 10),
                         formatString("전화번호", 15),
                         formatString("학년", 5),
+                        formatString("학과", 20),
                         formatString("상태", 5),
                         formatString("동아리 코드", 12));
-            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("------------------------------------------------------------------------------------------------------");
             
             do {
                 String stu_id = formatString(rs.getString(1), 13);
                 String stu_name = formatString(rs.getString(2), 10);
                 String stu_phone = formatString(rs.getString(3), 15);
                 String stu_grade = formatString(rs.getString(4), 5);
-                String stu_state = formatString(rs.getString(5), 5);
-                String club_id = formatString(rs.getString(6), 12);
-                System.out.printf("| %s | %s | %s | %s | %s | %s |\n", stu_id, stu_name, stu_phone, stu_grade,
-                        stu_state, club_id);
+                String stu_dept = formatString(rs.getString(5), 20);
+                String stu_state = formatString(rs.getString(6), 5);
+                String club_id = formatString(rs.getString(7), 12);
+                System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n", stu_id, stu_name, stu_phone, stu_grade,
+                        stu_dept, stu_state, club_id);
             } while (rs.next());
-            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("------------------------------------------------------------------------------------------------------");
         
             stmt.close();
 
@@ -111,6 +113,8 @@ public class student {
             String stu_phone = sc.next();
             System.out.print("학생 학년 : ");
             int stu_grade = sc.nextInt();
+            System.out.print("학생 학과 : ");
+            String stu_dept = sc.next();
             System.out.print("학생 상태 : ");
             String stu_state = sc.next();
 
@@ -132,14 +136,15 @@ public class student {
                 }
             }
 
-            String query = "INSERT INTO Student (stu_id, stu_name, stu_phone, stu_grade, stu_state, club_id) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO Student (stu_id, stu_name, stu_phone, stu_grade, stu_dept, stu_state, club_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, stu_id);
             pstmt.setString(2, stu_name);
             pstmt.setString(3, stu_phone);
             pstmt.setInt(4, stu_grade);
-            pstmt.setString(5, stu_state);
-            pstmt.setInt(6, valid_id);
+            pstmt.setString(5, stu_dept);
+            pstmt.setString(6, stu_state);
+            pstmt.setInt(7, valid_id);
 
             pstmt.executeUpdate();
             System.out.println(">> Student 테이블에 데이터를 성공적으로 삽입했습니다.");
@@ -179,16 +184,19 @@ public class student {
             String stu_phone = sc.next();
             System.out.print("학생 학년 : ");
             int stu_grade = sc.nextInt();
+            System.out.print("학생 학과 : ");
+            String stu_dept = sc.next();
             System.out.print("학생 상태 : ");
             String stu_state = sc.next();
 
-            String updateQuery = "UPDATE Student SET stu_name = ?, stu_phone = ?, stu_grade = ?, stu_state = ? WHERE stu_id = ?";
+            String updateQuery = "UPDATE Student SET stu_name = ?, stu_phone = ?, stu_grade = ?, stu_dept = ?, stu_state = ? WHERE stu_id = ?";
             PreparedStatement updatePstmt = con.prepareStatement(updateQuery);
             updatePstmt.setString(1, stu_name);
             updatePstmt.setString(2, stu_phone);
             updatePstmt.setInt(3, stu_grade);
-            updatePstmt.setString(4, stu_state);
-            updatePstmt.setString(5, stu_id);
+            updatePstmt.setString(4, stu_dept);
+            updatePstmt.setString(5, stu_state);
+            updatePstmt.setString(6, stu_id);
             
             updatePstmt.executeUpdate();
             System.out.println(">> Student 테이블에 데이터를 성공적으로 수정했습니다.");
@@ -254,27 +262,29 @@ public class student {
                 return;
             }
 
-            System.out.print("\n-------------------------------------------------------------------------------\n");
-            System.out.printf("| %s | %s | %s | %s | %s | %s |\n",
+            System.out.print("\n------------------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n",
                         formatString("학생 번호", 13),
                         formatString("학생 이름", 10),
                         formatString("전화번호", 15),
                         formatString("학년", 5),
+                        formatString("학과", 20),
                         formatString("상태", 5),
                         formatString("동아리 코드", 12));
-            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("------------------------------------------------------------------------------------------------------");
             
             do {
                 String stu_id = formatString(rs.getString(1), 13);
                 String stu_name = formatString(rs.getString(2), 10);
                 String stu_phone = formatString(rs.getString(3), 15);
                 String stu_grade = formatString(rs.getString(4), 5);
-                String stu_state = formatString(rs.getString(5), 5);
-                String club_id = formatString(rs.getString(6), 12);
-                System.out.printf("| %s | %s | %s | %s | %s | %s |\n", stu_id, stu_name, stu_phone, stu_grade,
-                        stu_state, club_id);
+                String stu_dept = formatString(rs.getString(5), 20);
+                String stu_state = formatString(rs.getString(6), 5);
+                String club_id = formatString(rs.getString(7), 12);
+                System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n", stu_id, stu_name, stu_phone, stu_grade,
+                        stu_dept, stu_state, club_id);
             } while (rs.next());
-            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("------------------------------------------------------------------------------------------------------");
         
             pstmt.close();
 

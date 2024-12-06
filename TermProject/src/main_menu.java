@@ -106,13 +106,9 @@ public class main_menu {
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Club (club_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, club_name VARCHAR(20) NOT NULL, room_num INT, total_num INT, prof_id VARCHAR(10), FOREIGN KEY (prof_id) REFERENCES Professor(prof_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Student (stu_id VARCHAR(12) NOT NULL PRIMARY KEY, stu_name VARCHAR(10) NOT NULL, stu_phone VARCHAR(15), stu_grade INT, stu_state VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Student (stu_id VARCHAR(12) NOT NULL PRIMARY KEY, stu_name VARCHAR(10) NOT NULL, stu_phone VARCHAR(15), stu_grade INT, stu_dept VARCHAR(20), stu_state VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS StuDept (stu_id VARCHAR(12) NOT NULL PRIMARY KEY, dept VARCHAR(20) NOT NULL, FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
-            stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Manager (man_id VARCHAR(12) NOT NULL PRIMARY KEY, man_name VARCHAR(10) NOT NULL, man_phone VARCHAR(15), man_grade INT, position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
-            stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS ManDept (man_id VARCHAR(12) NOT NULL PRIMARY KEY, dept VARCHAR(20) NOT NULL, FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
+                    "CREATE TABLE IF NOT EXISTS Manager (man_id VARCHAR(12) NOT NULL PRIMARY KEY, man_name VARCHAR(10) NOT NULL, man_phone VARCHAR(15), man_grade INT, man_dept VARCHAR(20), position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Event (event_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, host VARCHAR(10))");
             stmt.executeUpdate(
