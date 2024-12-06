@@ -56,6 +56,14 @@ public class main_menu {
                         System.out.println("동아리 관리 DB와 먼저 연결해주세요.");
                     }
                     break;
+                case 5:
+                    if (con != null) {
+                        manager.manager_menu(con, sc);
+                    } else {
+                        System.out.println("동아리 관리 DB와 연결되어 있지 않습니다.");
+                        System.out.println("동아리 관리 DB와 먼저 연결해주세요.");
+                    }
+                    break;
                 case 9:
                     con = closeConnection(con);
                     if (con == null) {
