@@ -54,8 +54,9 @@ public class professor {
     // 전체 교수님 목록 출력 함수
     public static void selectALLProfessor(Connection con) {
         try {
+            String query = "SELECT * FROM Professor ORDER BY prof_id ASC;";
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Professor ORDER BY prof_id ASC;");
+            ResultSet rs = stmt.executeQuery(query);
 
             System.out.print("\n---------------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s |\n",
@@ -202,9 +203,10 @@ public class professor {
             System.out.print("검색할 교수님 아이디 : ");
             String search_prof_id = sc.next();
 
-            String query = "SELECT * FROM Professor WHERE prof_id = " + search_prof_id + ";";
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+            String query = "SELECT * FROM Professor WHERE prof_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery(query);
+            pstmt.setString(1, search_prof_id);
             
             System.out.print("\n---------------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s |\n",
@@ -224,7 +226,7 @@ public class professor {
             }
             System.out.println("---------------------------------------------------------------------------------------------------");
 
-            stmt.close();
+            pstmt.close();
 
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
