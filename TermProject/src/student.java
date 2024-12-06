@@ -34,6 +34,9 @@ public class student {
                 case 4:
                     deleteStudent(con, sc);
                     break;
+                case 5:
+                    selectStudent(con, sc);
+                    break;
                 case 6:
                     return;
             }
@@ -154,6 +157,7 @@ public class student {
         }
     }
 
+    // 회원 수정 함수
     public static void updateStudent(Connection con, Scanner sc) {
         try {
             System.out.print("\n수정할 학생 번호 : ");
@@ -228,6 +232,57 @@ public class student {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 회원 검색 함수
+    public static void selectStudent(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n검색할 회원 번호 : ");
+            String search_stu_id = sc.next();
+
+            String query = "SELECT * FROM Student WHERE stu_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, search_stu_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if(!rs.next()){
+                System.out.println(">> 해당 회원 번호가 존재하지 않습니다.");
+                return;
+            }
+
+            System.out.print("\n-------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s | %s |\n",
+                        formatString("학생 번호", 13),
+                        formatString("학생 이름", 10),
+                        formatString("전화번호", 15),
+                        formatString("학년", 5),
+                        formatString("상태", 5),
+                        formatString("동아리 코드", 12));
+            System.out.println("-------------------------------------------------------------------------------");
+            
+            do {
+                String stu_id = formatString(rs.getString(1), 13);
+                String stu_name = formatString(rs.getString(2), 10);
+                String stu_phone = formatString(rs.getString(3), 15);
+                String stu_grade = formatString(rs.getString(4), 5);
+                String stu_state = formatString(rs.getString(5), 5);
+                String club_id = formatString(rs.getString(6), 12);
+                System.out.printf("| %s | %s | %s | %s | %s | %s |\n", stu_id, stu_name, stu_phone, stu_grade,
+                        stu_state, club_id);
+            } while (rs.next());
+            System.out.println("-------------------------------------------------------------------------------");
+        
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
