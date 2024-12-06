@@ -26,11 +26,15 @@ public class professor {
                 case 2:
                     insertProfessor(con, sc);
                     break;
+                case 3:
+                    updateProfessor(con, sc);
+                    break;
                 case 4:
                     deleteProfessor(con, sc);
                     break;
                 case 5:
                     selectProfessor(con, sc);
+                    break;
                 case 6:
                     return;
             }
@@ -78,8 +82,6 @@ public class professor {
             
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
-            System.out.println(">> SQL State : " + e.getSQLState());
-            System.out.println(">> Error Code : " + e.getErrorCode());
             
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
@@ -118,11 +120,54 @@ public class professor {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
-            if (e.getSQLState() != null) {
-                System.out.println(">> SQL State : " + e.getSQLState());
-                System.out.println(">> Error Code : " + e.getErrorCode());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 교수님 수정 함수
+    public static void updateProfessor(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n수정할 교수님 아이디 : ");
+            String prof_id = sc.next();
+
+            String query = "SELECT * FROM Professor WHERE prof_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, prof_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 해당 교수님 아이디가 존재하지 않습니다.");
+                return;
             }
 
+            System.out.print("교수님 성함 : ");
+            String prof_name = sc.next();
+            System.out.print("교수님 이메일 : ");
+            String email = sc.next();
+            System.out.print("랩실 이름 : ");
+            String lab_name = sc.next();
+            System.out.print("랩실 호수 : ");
+            int lab_num = sc.nextInt();
+
+            String updateQuery = "UPDATE Professor SET prof_name = ?, email = ?, lab_name = ?, lab_num = ? WHERE prof_id = ?";
+            PreparedStatement updatePstmt = con.prepareStatement(updateQuery);
+            updatePstmt.setString(1, prof_name);
+            updatePstmt.setString(2, email);
+            updatePstmt.setString(3, lab_name);
+            updatePstmt.setInt(4, lab_num);
+            updatePstmt.setString(5, prof_name);
+
+            updatePstmt.executeUpdate();
+            System.out.println(">> Professor 테이블에 데이터를 성공적으로 수정했습니다.");
+
+            pstmt.close();
+            updatePstmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
+            
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
@@ -132,11 +177,11 @@ public class professor {
     public static void deleteProfessor(Connection con, Scanner sc) {
         try {
             System.out.print("\n삭제할 교수님 아이디 : ");
-            int prof_id = sc.nextInt();
+            String prof_id = sc.next();
 
             String query = "DELETE FROM Professor WHERE prof_id = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setInt(1, prof_id);
+            pstmt.setString(1, prof_id);
 
             pstmt.executeUpdate();
             System.out.println(">> Professor 테이블에 데이터를 성공적으로 삭제했습니다.");
@@ -145,10 +190,6 @@ public class professor {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
-            if (e.getSQLState() != null) {
-                System.out.println(">> SQL State : " + e.getSQLState());
-                System.out.println(">> Error Code : " + e.getErrorCode());
-            }
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
@@ -190,8 +231,6 @@ public class professor {
             
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
-            System.out.println(">> SQL State : " + e.getSQLState());
-            System.out.println(">> Error Code : " + e.getErrorCode());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
