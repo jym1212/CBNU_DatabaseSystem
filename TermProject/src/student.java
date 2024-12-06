@@ -28,6 +28,9 @@ public class student {
                 case 2:
                     insertStudent(con, sc);
                     break;
+                case 4:
+                    deleteStudent(con, sc);
+                    break;
                 case 6:
                     return;
             }
@@ -116,14 +119,14 @@ public class student {
                 if (!check_rs.next()) {
                     System.out.println(">> 데이터 삽입 실패 : 학생 번호가 존재하지 않습니다.");
                     checkPstmt.close();
-                    return;                     
+                    return;
                 } else {
                     valid_id = club_id;
                     checkPstmt.close();
                 }
             }
 
-            String query = "INSERT INTO Student (stu_id, stu_name, stu_phone, stu_grade, stu_state, club_id) VALUES (?, ?, ?, ?, ?, ?)"; 
+            String query = "INSERT INTO Student (stu_id, stu_name, stu_phone, stu_grade, stu_state, club_id) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, stu_id);
             pstmt.setString(2, stu_name);
@@ -148,4 +151,37 @@ public class student {
         }
     }
     
+    // 회원 삭제 함수
+    public static void deleteStudent(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n삭제할 학생 번호 : ");
+            String stu_id = sc.next();
+
+            String query = "SELECT * FROM Student WHERE stu_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, stu_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 해당 학생 번호가 존재하지 않습니다.");
+                return;
+            }
+
+            String deleteQuery = "DELETE FROM Student WHERE stu_id = ?";
+            PreparedStatement deletePstmt = con.prepareStatement(deleteQuery);
+            deletePstmt.setString(1, stu_id);
+
+            deletePstmt.executeUpdate();
+            System.out.println(">> Student 테이블에 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
+            deletePstmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
 }
