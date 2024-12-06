@@ -28,6 +28,9 @@ public class student {
                 case 2:
                     insertStudent(con, sc);
                     break;
+                case 3:
+                    updateStudent(con, sc);
+                    break;
                 case 4:
                     deleteStudent(con, sc);
                     break;
@@ -146,6 +149,52 @@ public class student {
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
 
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    public static void updateStudent(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n수정할 학생 번호 : ");
+            String stu_id = sc.next();
+
+            String query = "SELECT * FROM Student WHERE stu_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, stu_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 해당 학생 번호가 존재하지 않습니다.");
+                return;
+            }
+
+            System.out.print("학생 이름 : ");
+            String stu_name = sc.next();
+            System.out.print("전화번호 : ");
+            String stu_phone = sc.next();
+            System.out.print("학생 학년 : ");
+            int stu_grade = sc.nextInt();
+            System.out.print("학생 상태 : ");
+            String stu_state = sc.next();
+
+            String updateQuery = "UPDATE Student SET stu_name = ?, stu_phone = ?, stu_grade = ?, stu_state = ? WHERE stu_id = ?";
+            PreparedStatement updatePstmt = con.prepareStatement(updateQuery);
+            updatePstmt.setString(1, stu_name);
+            updatePstmt.setString(2, stu_phone);
+            updatePstmt.setInt(3, stu_grade);
+            updatePstmt.setString(4, stu_state);
+            updatePstmt.setString(5, stu_id);
+            
+            updatePstmt.executeUpdate();
+            System.out.println(">> Student 테이블에 데이터를 성공적으로 수정했습니다.");
+
+            pstmt.close();
+            updatePstmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
+            
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
