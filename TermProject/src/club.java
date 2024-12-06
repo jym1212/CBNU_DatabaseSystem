@@ -54,20 +54,25 @@ public class club {
     // 전체 동아리 목록 출력 함수
     public static void selectALLClub(Connection con) {
         try {
+            String query = "SELECT * FROM Club ORDER BY club_id ASC;";
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Club ORDER BY club_id ASC;");
+            ResultSet rs = stmt.executeQuery(query);
 
-            System.out.print("\n---------------------------------------------------------\n");
-            System.out.println("| 동아리 코드 | 동아리 이름 | 동아리 호수 | 동아리 인원 |");
-            System.out.println("---------------------------------------------------------");
+            System.out.print("\n-------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s |\n",
+                        formatString("동아리 코드", 12),
+                        formatString("동아리 이름", 12),
+                        formatString("동아리 호수", 12),
+                        formatString("동아리 인원", 12));
+            System.out.println("-------------------------------------------------------------");
             while (rs.next()) {
                 String club_id = formatString(rs.getString(1), 12);
                 String club_name = formatString(rs.getString(2), 12);
                 String room_num = formatString(rs.getString(3), 12);
                 String total_mum = formatString(rs.getString(4), 12);
-                System.out.printf("| %s| %s| %s| %s|\n", club_id, club_name, room_num, total_mum);
+                System.out.printf("| %s | %s | %s | %s |\n", club_id, club_name, room_num, total_mum);
             }
-            System.out.println("---------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------");
 
             stmt.close();
 
@@ -76,8 +81,6 @@ public class club {
             
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
-            System.out.println(">> SQL State : " + e.getSQLState());
-            System.out.println(">> Error Code : " + e.getErrorCode());
             
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
@@ -113,10 +116,6 @@ public class club {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
-            if (e.getSQLState() != null) {
-                System.out.println(">> SQL State : " + e.getSQLState());
-                System.out.println(">> Error Code : " + e.getErrorCode());
-            }
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
@@ -161,10 +160,6 @@ public class club {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
-            if (e.getSQLState() != null) {
-                System.out.println(">> SQL State : " + e.getSQLState());
-               System.out.println(">> Error Code : " + e.getErrorCode());
-            }
             
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
@@ -188,10 +183,6 @@ public class club {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
-            if (e.getSQLState() != null) {
-                System.out.println(">> SQL State : " + e.getSQLState());
-                System.out.println(">> Error Code : " + e.getErrorCode());
-            }
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
@@ -202,22 +193,28 @@ public class club {
     public static void selectClub(Connection con, Scanner sc) {
         try {
             System.out.print("\n검색할 동아리 코드 : ");
-            int club_id = sc.nextInt();
+            int search_club_id = sc.nextInt();
             
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Club WHERE club_id = " + club_id + ";");
+            String query = "SELECT * FROM Club WHERE club_id = ?";
+            PreparedStatement stmt = con.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery(query);
+            stmt.setInt(1, search_club_id);
 
-            System.out.print("\n---------------------------------------------------------\n");
-            System.out.println("| 동아리 코드 | 동아리 이름 | 동아리 호수 | 동아리 인원 |");
-            System.out.println("---------------------------------------------------------");
+            System.out.print("\n-------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s |\n",
+                        formatString("동아리 코드", 12),
+                        formatString("동아리 이름", 12),
+                        formatString("동아리 호수", 12),
+                        formatString("동아리 인원", 12));
+            System.out.println("-------------------------------------------------------------");
             while (rs.next()) {
-                String clubId = formatString(rs.getString(1), 12);
-                String clubName = formatString(rs.getString(2), 12);
-                String roomNum = formatString(rs.getString(3), 12);
-                String totalNum = formatString(rs.getString(4), 12);
-                System.out.printf("| %s| %s| %s| %s|\n", clubId, clubName, roomNum, totalNum);
+                String club_id = formatString(rs.getString(1), 12);
+                String club_name = formatString(rs.getString(2), 12);
+                String room_num = formatString(rs.getString(3), 12);
+                String total_mum = formatString(rs.getString(4), 12);
+                System.out.printf("| %s | %s | %s | %s |\n", club_id, club_name, room_num, total_mum);
             }
-            System.out.println("---------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------");
 
             stmt.close();
         
@@ -226,8 +223,6 @@ public class club {
             
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
-            System.out.println(">> SQL State : " + e.getSQLState());
-            System.out.println(">> Error Code : " + e.getErrorCode());
             
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
