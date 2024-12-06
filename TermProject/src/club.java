@@ -58,6 +58,11 @@ public class club {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
+            if (!rs.next()) {
+                System.out.print("\n>> 동아리가 존재하지 않습니다.\n");
+                return;
+            }
+
             System.out.print("\n-------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s |\n",
                         formatString("동아리 코드", 12),
@@ -65,13 +70,14 @@ public class club {
                         formatString("동아리 호수", 12),
                         formatString("동아리 인원", 12));
             System.out.println("-------------------------------------------------------------");
-            while (rs.next()) {
+            
+            do {
                 String club_id = formatString(rs.getString(1), 12);
                 String club_name = formatString(rs.getString(2), 12);
                 String room_num = formatString(rs.getString(3), 12);
                 String total_mum = formatString(rs.getString(4), 12);
                 System.out.printf("| %s | %s | %s | %s |\n", club_id, club_name, room_num, total_mum);
-            }
+            } while (rs.next());
             System.out.println("-------------------------------------------------------------");
 
             stmt.close();
@@ -172,14 +178,25 @@ public class club {
             System.out.print("\n삭제할 동아리 코드 : ");
             int club_id = sc.nextInt();
 
-            String query = "DELETE FROM Club WHERE club_id = ?";
+            String query = "SELECT * FROM Club WHERE club_id = ?;";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setInt(1, club_id);
+            ResultSet rs = pstmt.executeQuery();
 
-            pstmt.executeUpdate();
+            if (!rs.next()) {
+                System.out.println(">> 해당 동아리 코드가 존재하지 않습니다.");
+                return;
+            }
+
+            String deleteQuery = "DELETE FROM Club WHERE club_id = ?";
+            PreparedStatement deletePstmt = con.prepareStatement(deleteQuery);
+            deletePstmt.setInt(1, club_id);
+
+            deletePstmt.executeUpdate();
             System.out.println(">> Club 테이블에 데이터를 성공적으로 삭제했습니다.");
 
             pstmt.close();
+            deletePstmt.close();
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
@@ -196,9 +213,14 @@ public class club {
             int search_club_id = sc.nextInt();
             
             String query = "SELECT * FROM Club WHERE club_id = ?";
-            PreparedStatement stmt = con.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery(query);
-            stmt.setInt(1, search_club_id);
+            PreparedStatement pstmt = con.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery(query);
+            pstmt.setInt(1, search_club_id);
+
+            if (!rs.next()) {
+                System.out.println(">> 해당 동아리 코드가 존재하지 않습니다.");
+                return;
+            }
 
             System.out.print("\n-------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s |\n",
@@ -207,16 +229,16 @@ public class club {
                         formatString("동아리 호수", 12),
                         formatString("동아리 인원", 12));
             System.out.println("-------------------------------------------------------------");
-            while (rs.next()) {
+            do {
                 String club_id = formatString(rs.getString(1), 12);
                 String club_name = formatString(rs.getString(2), 12);
                 String room_num = formatString(rs.getString(3), 12);
                 String total_mum = formatString(rs.getString(4), 12);
                 System.out.printf("| %s | %s | %s | %s |\n", club_id, club_name, room_num, total_mum);
-            }
+            } while (rs.next());
             System.out.println("-------------------------------------------------------------");
 
-            stmt.close();
+            pstmt.close();
         
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());

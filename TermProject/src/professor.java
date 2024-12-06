@@ -7,7 +7,7 @@ public class professor {
 
         while (true) {
             System.out.print("\n\n===============================\n");
-            System.out.println("     전체 교수님 목록 관리      ");
+            System.out.println("     담당 교수님 관리 메뉴   ");
             System.out.println("===============================");
             System.out.println("1. 교수님 목록 출력");
             System.out.println("2. 교수님 추가");
@@ -58,22 +58,28 @@ public class professor {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
+            if (!rs.next()) {
+                System.out.print("\n>> 교수님이 존재하지 않습니다.\n");
+                return;
+            }
+            
             System.out.print("\n---------------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s |\n",
-                        formatString("교수님 아이디", 12),
+                        formatString("교수님 번호", 13),
                         formatString("교수님 성함", 10),
                         formatString("이메일", 30),
                         formatString("랩실 이름", 20),
                         formatString("랩실 호수", 6));
             System.out.println("---------------------------------------------------------------------------------------------------");
-            while (rs.next()) {
+
+            do {
                 String prof_id = formatString(rs.getString(1), 13);
                 String prof_name = formatString(rs.getString(2), 11);
                 String email = formatString(rs.getString(3), 30);
                 String lab_name = formatString(rs.getString(4), 20);
                 String lab_num = formatString(rs.getString(5), 9);
                 System.out.printf("| %s | %s | %s | %s | %s |\n", prof_id, prof_name, email, lab_name, lab_num);
-            }
+            } while (rs.next());
             System.out.println("---------------------------------------------------------------------------------------------------");
 
             stmt.close();
@@ -92,7 +98,7 @@ public class professor {
     // 교수님 추가 함수
     public static void insertProfessor(Connection con, Scanner sc) {
         try {
-            System.out.print("교수님 아이디 : ");
+            System.out.print("\n교수님 번호 : ");
             String prof_id = sc.next();
             System.out.print("교수님 성함 : ");
             String prof_name = sc.next();
@@ -117,7 +123,7 @@ public class professor {
             pstmt.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println(">> 데이터 삽입 실패 : 교수님 아이디가 이미 존재합니다.");
+            System.out.println(">> 데이터 삽입 실패 : 교수님 번호가 이미 존재합니다.");
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
@@ -130,7 +136,7 @@ public class professor {
     // 교수님 수정 함수
     public static void updateProfessor(Connection con, Scanner sc) {
         try {
-            System.out.print("\n수정할 교수님 아이디 : ");
+            System.out.print("\n수정할 교수님 번호 : ");
             String prof_id = sc.next();
 
             String query = "SELECT * FROM Professor WHERE prof_id = ?;";
@@ -139,7 +145,7 @@ public class professor {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 해당 교수님 아이디가 존재하지 않습니다.");
+                System.out.println(">> 해당 교수님 번호가 존재하지 않습니다.");
                 return;
             }
 
@@ -158,7 +164,7 @@ public class professor {
             updatePstmt.setString(2, email);
             updatePstmt.setString(3, lab_name);
             updatePstmt.setInt(4, lab_num);
-            updatePstmt.setString(5, prof_name);
+            updatePstmt.setString(5, prof_id);
 
             updatePstmt.executeUpdate();
             System.out.println(">> Professor 테이블에 데이터를 성공적으로 수정했습니다.");
@@ -177,17 +183,28 @@ public class professor {
     // 교수님 삭제 함수
     public static void deleteProfessor(Connection con, Scanner sc) {
         try {
-            System.out.print("\n삭제할 교수님 아이디 : ");
+            System.out.print("\n삭제할 교수님 번호 : ");
             String prof_id = sc.next();
 
-            String query = "DELETE FROM Professor WHERE prof_id = ?";
+            String query = "SELECT * FROM Professor WHERE prof_id = ?;";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, prof_id);
+            ResultSet rs = pstmt.executeQuery();
 
-            pstmt.executeUpdate();
+            if (!rs.next()) {
+                System.out.println(">> 해당 교수님 번호가 존재하지 않습니다.");
+                return;
+            }
+
+            String deleteQuery = "DELETE FROM Professor WHERE prof_id = ?";
+            PreparedStatement deletePstmt = con.prepareStatement(deleteQuery);
+            deletePstmt.setString(1, prof_id);
+
+            deletePstmt.executeUpdate();
             System.out.println(">> Professor 테이블에 데이터를 성공적으로 삭제했습니다.");
 
             pstmt.close();
+            deletePstmt.close();
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
@@ -200,30 +217,35 @@ public class professor {
     // 교수님 검색 함수
     public static void selectProfessor(Connection con, Scanner sc) {
         try {
-            System.out.print("검색할 교수님 아이디 : ");
+            System.out.print("\n검색할 교수님 번호 : ");
             String search_prof_id = sc.next();
 
             String query = "SELECT * FROM Professor WHERE prof_id = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
-            ResultSet rs = pstmt.executeQuery(query);
             pstmt.setString(1, search_prof_id);
-            
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 해당 교수님 번호가 존재하지 않습니다.");
+                return;
+            }
+
             System.out.print("\n---------------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s |\n",
-                        formatString("교수님 아이디", 12),
+                        formatString("교수님 번호", 13),
                         formatString("교수님 성함", 10),
                         formatString("이메일", 30),
                         formatString("랩실 이름", 20),
                         formatString("랩실 호수", 6));
             System.out.println("---------------------------------------------------------------------------------------------------");
-            while (rs.next()) {
+            do {
                 String prof_id = formatString(rs.getString(1), 13);
                 String prof_name = formatString(rs.getString(2), 11);
                 String email = formatString(rs.getString(3), 30);
                 String lab_name = formatString(rs.getString(4), 20);
                 String lab_num = formatString(rs.getString(5), 9);
                 System.out.printf("| %s | %s | %s | %s | %s |\n", prof_id, prof_name, email, lab_name, lab_num);
-            }
+            } while (rs.next());
             System.out.println("---------------------------------------------------------------------------------------------------");
 
             pstmt.close();
