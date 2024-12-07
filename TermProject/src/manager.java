@@ -22,8 +22,12 @@ public class manager {
             switch (menu) {
                 case 1:
                     selectALLManager(con);
+                    break;
                 case 2:
                     insertManager(con, sc);
+                    break;
+                case 3:
+                    updateManager(con, sc);
                     break;
                 case 6:
                     return;
@@ -53,7 +57,7 @@ public class manager {
                 return;
             }
 
-            System.out.print("\n--------------------------------------------------------------------------------------------------------------------\n");
+            System.out.print("\n-----------------------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n",
                         formatString("임원 번호", 13),
                         formatString("임원 이름", 10),
@@ -62,7 +66,7 @@ public class manager {
                         formatString("학과", 20),
                         formatString("직책", 10),
                         formatString("동아리 코드", 12));
-            System.out.println("--------------------------------------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------------------------");
         
             do {
                 String man_id = formatString(rs.getString(1), 13);
@@ -75,7 +79,7 @@ public class manager {
                 System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n", man_id, man_name, man_phone, man_grade,
                         man_dept, position, club_id);
             } while (rs.next());
-            System.out.println("--------------------------------------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------------------------");
             
             stmt.close();
 
@@ -115,7 +119,7 @@ public class manager {
                 pstmt.setInt(1, club_id);
                 ResultSet rs = pstmt.executeQuery();
                 if (!rs.next()) {
-                    System.out.println(">> 데이터 삽입 실패 : 해당 동아리가 존재하지 않습니다.");
+                    System.out.println(">> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.");
                     pstmt.close();
                     return;
                 } else {
@@ -139,12 +143,61 @@ public class manager {
 
             insertPstmt.close();
 
-    
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println(">> 데이터 삽입 실패 : 임원 번호가 이미 존재합니다.");
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 임원 수정 함수
+    public static void updateManager(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n수정할 임원 번호 : ");
+            String man_id = sc.next();
+
+            String query = "SELECT * FROM Manager WHERE man_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, man_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 수정 실패 : 해당 임원 번호가 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print("임원 이름 : ");
+            String man_name = sc.next();
+            System.out.print("전화번호 : ");
+            String man_phone = sc.next();
+            System.out.print("임원 학년 : ");
+            int man_grade = sc.nextInt();
+            System.out.print("임원 학과 : ");
+            String man_dept = sc.next();
+            System.out.print("임원 직책 : ");
+            String position = sc.next();
+
+            String updateQuery = "UPDATE Manager SET man_name = ?, man_phone = ?, man_grade = ?, man_dept = ?, position = ? WHERE man_id = ?;";
+            PreparedStatement updatePstmt = con.prepareStatement(updateQuery);
+            updatePstmt.setString(1, man_name);
+            updatePstmt.setString(2, man_phone);
+            updatePstmt.setInt(3, man_grade);
+            updatePstmt.setString(4, man_dept);
+            updatePstmt.setString(5, position);
+            updatePstmt.setString(6, man_id);
+
+            updatePstmt.executeUpdate();
+            System.out.println(">> Manager 테이블의 데이터를 성공적으로 수정했습니다.");
+
+            pstmt.close();
+            updatePstmt.close();
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
