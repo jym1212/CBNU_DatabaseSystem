@@ -29,6 +29,9 @@ public class manager {
                 case 3:
                     updateManager(con, sc);
                     break;
+                case 4:
+                    deleteManager(con, sc);
+                    break;
                 case 6:
                     return;
             }
@@ -46,8 +49,8 @@ public class manager {
     }
 
     // 전체 임원 목록 출력 함수
-    public static void selectALLManager(Connection con){
-        try{
+    public static void selectALLManager(Connection con) {
+        try {
             String query = "SELECT * FROM Manager ORDER BY club_id, man_id";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
@@ -57,17 +60,19 @@ public class manager {
                 return;
             }
 
-            System.out.print("\n-----------------------------------------------------------------------------------------------------------\n");
+            System.out.print(
+                    "\n-----------------------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n",
-                        formatString("임원 번호", 13),
-                        formatString("임원 이름", 10),
-                        formatString("전화번호", 15),
-                        formatString("학년", 5),
-                        formatString("학과", 20),
-                        formatString("직책", 10),
-                        formatString("동아리 코드", 12));
-            System.out.println("-----------------------------------------------------------------------------------------------------------");
-        
+                    formatString("임원 번호", 13),
+                    formatString("임원 이름", 10),
+                    formatString("전화번호", 15),
+                    formatString("학년", 5),
+                    formatString("학과", 20),
+                    formatString("직책", 10),
+                    formatString("동아리 코드", 12));
+            System.out.println(
+                    "-----------------------------------------------------------------------------------------------------------");
+
             do {
                 String man_id = formatString(rs.getString(1), 13);
                 String man_name = formatString(rs.getString(2), 10);
@@ -79,16 +84,17 @@ public class manager {
                 System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n", man_id, man_name, man_phone, man_grade,
                         man_dept, position, club_id);
             } while (rs.next());
-            System.out.println("-----------------------------------------------------------------------------------------------------------");
-            
+            System.out.println(
+                    "-----------------------------------------------------------------------------------------------------------");
+
             stmt.close();
 
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
-            
+
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
-            
+
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
@@ -153,7 +159,7 @@ public class manager {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
     }
-    
+
     // 임원 수정 함수
     public static void updateManager(Connection con, Scanner sc) {
         try {
@@ -198,6 +204,41 @@ public class manager {
             updatePstmt.close();
         } catch (SQLException e) {
             System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 임원 삭제 함수
+    public static void deleteManager(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n삭제할 임원 번호 : ");
+            String man_id = sc.next();
+
+            String query = "SELECT * FROM Manager WHERE man_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, man_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 수정 실패 : 해당 임원 번호가 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            String deleteQuery = "DELETE FROM Manager WHERE man_id = ?;";
+            PreparedStatement deletePstmt = con.prepareStatement(deleteQuery);
+            deletePstmt.setString(1, man_id);
+
+            deletePstmt.executeUpdate();
+            System.out.println(">> Manager 테이블의 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
+            deletePstmt.close();
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
