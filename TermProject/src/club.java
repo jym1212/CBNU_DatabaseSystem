@@ -37,6 +37,10 @@ public class club {
                     break;
                 case 6:
                     return;
+                default:
+                    System.out.println("잘못된 메뉴 선택입니다.");
+                    System.out.println("다시 선택해주세요.");
+                    break;
             }
         }
     }
