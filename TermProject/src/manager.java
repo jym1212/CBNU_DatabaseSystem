@@ -32,6 +32,9 @@ public class manager {
                 case 4:
                     deleteManager(con, sc);
                     break;
+                case 5:
+                    selectManager(con, sc);
+                    break;
                 case 6:
                     return;
             }
@@ -236,9 +239,65 @@ public class manager {
 
             pstmt.close();
             deletePstmt.close();
-            
+
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 임원 검색 함수
+    public static void selectManager(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n검색할 임원 번호 : ");
+            String search_man_id = sc.next();
+
+            String query = "SELECT * FROM Manager WHERE man_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, search_man_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 검색 실패 : 해당 임원 번호가 존재하지 않습니다.");
+                return;
+            }
+
+             System.out.print(
+                    "\n-----------------------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n",
+                    formatString("임원 번호", 13),
+                    formatString("임원 이름", 10),
+                    formatString("전화번호", 15),
+                    formatString("학년", 5),
+                    formatString("학과", 20),
+                    formatString("직책", 10),
+                    formatString("동아리 코드", 12));
+            System.out.println(
+                    "-----------------------------------------------------------------------------------------------------------");
+
+            do {
+                String man_id = formatString(rs.getString(1), 13);
+                String man_name = formatString(rs.getString(2), 10);
+                String man_phone = formatString(rs.getString(3), 15);
+                String man_grade = formatString(rs.getString(4), 5);
+                String man_dept = formatString(rs.getString(5), 20);
+                String position = formatString(rs.getString(6), 10);
+                String club_id = formatString(rs.getString(7), 12);
+                System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n", man_id, man_name, man_phone, man_grade,
+                        man_dept, position, club_id);
+            } while (rs.next());
+            System.out.println(
+                    "-----------------------------------------------------------------------------------------------------------");
+
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
