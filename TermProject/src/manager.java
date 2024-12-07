@@ -20,6 +20,8 @@ public class manager {
             menu = sc.nextInt();
 
             switch (menu) {
+                case 1:
+                    selectALLManager(con);
                 case 2:
                     insertManager(con, sc);
                     break;
@@ -37,6 +39,55 @@ public class manager {
         }
         int padding = length - realLength;
         return str + " ".repeat(Math.max(0, padding));
+    }
+
+    // 전체 임원 목록 출력 함수
+    public static void selectALLManager(Connection con){
+        try{
+            String query = "SELECT * FROM Manager ORDER BY club_id, man_id";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            if (!rs.next()) {
+                System.out.print("\n>> 임원이 존재하지 않습니다.\n");
+                return;
+            }
+
+            System.out.print("\n--------------------------------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n",
+                        formatString("임원 번호", 13),
+                        formatString("임원 이름", 10),
+                        formatString("전화번호", 15),
+                        formatString("학년", 5),
+                        formatString("학과", 20),
+                        formatString("직책", 10),
+                        formatString("동아리 코드", 12));
+            System.out.println("--------------------------------------------------------------------------------------------------------------------");
+        
+            do {
+                String man_id = formatString(rs.getString(1), 13);
+                String man_name = formatString(rs.getString(2), 10);
+                String man_phone = formatString(rs.getString(3), 15);
+                String man_grade = formatString(rs.getString(4), 5);
+                String man_dept = formatString(rs.getString(5), 20);
+                String position = formatString(rs.getString(6), 10);
+                String club_id = formatString(rs.getString(7), 12);
+                System.out.printf("| %s | %s | %s | %s | %s | %s | %s |\n", man_id, man_name, man_phone, man_grade,
+                        man_dept, position, club_id);
+            } while (rs.next());
+            System.out.println("--------------------------------------------------------------------------------------------------------------------");
+            
+            stmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+            
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
     }
 
     // 임원 추가 함수

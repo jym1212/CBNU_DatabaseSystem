@@ -56,7 +56,7 @@ public class student {
     // 전체 회원 목록 출력 함수
     public static void selectALLStudent(Connection con, Scanner sc) {
         try {
-            String query = "SELECT * FROM Student ORDER BY stu_id;";
+            String query = "SELECT * FROM Student ORDER BY club_id, stu_id;";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -127,7 +127,7 @@ public class student {
                 checkPstmt.setInt(1, club_id);
                 ResultSet check_rs = checkPstmt.executeQuery();
                 if (!check_rs.next()) {
-                    System.out.println(">> 데이터 삽입 실패 : 학생 번호가 존재하지 않습니다.");
+                    System.out.println(">> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.");
                     checkPstmt.close();
                     return;
                 } else {
