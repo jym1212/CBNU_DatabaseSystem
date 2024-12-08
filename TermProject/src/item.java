@@ -29,6 +29,9 @@ public class item {
                 case 3:
                     updateItem(con, sc);
                     break;
+                case 4:
+                    deleteItem(con, sc);
+                    break;
                 case 6:
                     return;
                 default:
@@ -193,7 +196,41 @@ public class item {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 비품 삭제 함수
+    public static void deleteItem(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n삭제할 비품 번호 : ");
+            int item_id = sc.nextInt();
+
+            String query = "SELECT * FROM Item WHERE item_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, item_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if(!rs.next()){
+                System.out.println(">> 데이터 삭제 실패 : 해당 비품 번호가 존재하지 않습니다.");
+                return;
+            }
+
+            String deleteQuery = "DELETE FROM Item WHERE item_id = ?;";
+            PreparedStatement deletePstmt = con.prepareStatement(deleteQuery);
+            deletePstmt.setInt(1, item_id);
+
+            deletePstmt.executeUpdate();
+            System.out.println(">> Item 테이블의 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
+            deletePstmt.close();
             
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
+
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
