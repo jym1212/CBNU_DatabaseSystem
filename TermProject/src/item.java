@@ -32,6 +32,9 @@ public class item {
                 case 4:
                     deleteItem(con, sc);
                     break;
+                case 5:
+                    selectItem(con, sc);
+                    break;
                 case 6:
                     return;
                 default:
@@ -204,7 +207,7 @@ public class item {
     
     // 비품 삭제 함수
     public static void deleteItem(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n삭제할 비품 번호 : ");
             int item_id = sc.nextInt();
 
@@ -213,7 +216,7 @@ public class item {
             pstmt.setInt(1, item_id);
             ResultSet rs = pstmt.executeQuery();
 
-            if(!rs.next()){
+            if (!rs.next()) {
                 System.out.println(">> 데이터 삭제 실패 : 해당 비품 번호가 존재하지 않습니다.");
                 return;
             }
@@ -227,10 +230,61 @@ public class item {
 
             pstmt.close();
             deletePstmt.close();
-            
+
         } catch (SQLException e) {
             System.out.println(">> 데이터 삭제 실패 : " + e.getMessage());
 
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 비품 검색 함수
+    public static void selectItem(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n검색할 비품 번호 : ");
+            int search_item_id = sc.nextInt();
+
+            String query = "SELECT * FROM Item WHERE item_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, search_item_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if(!rs.next()){
+                System.out.println(">> 데이터 검색 실패 : 해당 비품 번호가 존재하지 않습니다.");
+                return;
+            }   
+
+             System.out.print(
+                    "\n------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s |\n",
+                    formatString("비품 번호", 10),
+                    formatString("비품 이름", 20),
+                    formatString("비품 날짜", 15),
+                    formatString("비품 개수", 10),
+                    formatString("임원 번호", 13));
+            System.out.println(
+                    "------------------------------------------------------------------------------------");
+
+            do {
+                String item_id = formatString(rs.getString(1), 10);
+                String item_name = formatString(rs.getString(2), 20);
+                String item_date = formatString(rs.getString(3), 15);
+                String total_num = formatString(rs.getString(4), 10);
+                String man_id = formatString(rs.getString(5), 13);
+                System.out.printf("| %s | %s | %s | %s | %s |\n", item_id, item_name, item_date, total_num, man_id);
+            } while (rs.next());
+            System.out.println(
+                    "------------------------------------------------------------------------------------");
+
+            pstmt.close();
+            
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+            
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+            
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
