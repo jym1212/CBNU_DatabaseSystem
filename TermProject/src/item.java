@@ -23,6 +23,9 @@ public class item {
                 case 1:
                     selectALLItem(con);
                     break;
+                case 2:
+                    insertItem(con, sc);
+                    break;
                 case 6:
                     return;
                 default:
@@ -54,15 +57,16 @@ public class item {
                 return;
             }
 
-            System.out.print("\n------------------------------------------------------------------------------------------------------\n");
+            System.out.print(
+                    "\n------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s |\n",
-                        formatString("비품 번호", 10),
-                        formatString("비품 이름", 20),
-                        formatString("비품 날짜", 15),
-                        formatString("비품 개수", 10),
-                        formatString("임원 번호", 13));
+                    formatString("비품 번호", 10),
+                    formatString("비품 이름", 20),
+                    formatString("비품 날짜", 15),
+                    formatString("비품 개수", 10),
+                    formatString("임원 번호", 13));
             System.out.println(
-                    "------------------------------------------------------------------------------------------------------");
+                    "------------------------------------------------------------------------------------");
 
             do {
                 String item_id = formatString(rs.getString(1), 10);
@@ -73,15 +77,74 @@ public class item {
                 System.out.printf("| %s | %s | %s | %s | %s |\n", item_id, item_name, item_date, total_num, man_id);
             } while (rs.next());
             System.out.println(
-                    "------------------------------------------------------------------------------------------------------");
-            
+                    "------------------------------------------------------------------------------------");
+
             stmt.close();
-        
+
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 비품 추가 함수
+    public static void insertItem(Connection con, Scanner sc) {
+        try {
+
+            System.out.print("\n비품 번호 : ");
+            int item_id = sc.nextInt();
+            System.out.print("비품 이름 : ");
+            String item_name = sc.next();
+            System.out.print("비품 날짜(YYYY-MM-DD) : ");
+            String item_date = sc.next();
+            java.sql.Date sql_date = java.sql.Date.valueOf(item_date);
+            System.out.print("비품 개수 : ");
+            int total_num = sc.nextInt();
+
+            System.out.print("임원 번호 : ");
+            String man_id = sc.next();
+            String valid_id = null;
+
+            String query = "SELECT man_id FROM Manager WHERE man_id = ?;";
+            try (PreparedStatement pstmt = con.prepareStatement(query)) {
+                pstmt.setString(1, man_id);
+                ResultSet rs = pstmt.executeQuery();
+                if (!rs.next()) {
+                    System.out.println(">> 데이터 삽입 실패 : 임원 번호가 존재하지 않습니다.");
+                    pstmt.close();
+                    return;
+                } else {
+                    valid_id = man_id;
+                    pstmt.close();
+                }
+            }
+
+            String insertQuery = "INSERT INTO Item (item_id, item_name, item_date, total_num, man_id) VALUES (?, ?, ?, ?, ?);";
+            PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+            insertPstmt.setInt(1, item_id);
+            insertPstmt.setString(2, item_name);
+            insertPstmt.setDate(3, sql_date);
+            insertPstmt.setInt(4, total_num);
+            insertPstmt.setString(5, valid_id);
+
+            insertPstmt.executeUpdate();
+            System.out.println(">> Item 테이블에 데이터를 성공적으로 삽입했습니다.");   
+
+            insertPstmt.close();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println(">> 데이터 삽입 실패 : 비품 번호가 이미 존재합니다.");
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 입력 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
