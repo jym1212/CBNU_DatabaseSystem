@@ -26,6 +26,9 @@ public class item {
                 case 2:
                     insertItem(con, sc);
                     break;
+                case 3:
+                    updateItem(con, sc);
+                    break;
                 case 6:
                     return;
                 default:
@@ -133,7 +136,7 @@ public class item {
             insertPstmt.setString(5, valid_id);
 
             insertPstmt.executeUpdate();
-            System.out.println(">> Item 테이블에 데이터를 성공적으로 삽입했습니다.");   
+            System.out.println(">> Item 테이블에 데이터를 성공적으로 삽입했습니다.");
 
             insertPstmt.close();
 
@@ -146,6 +149,51 @@ public class item {
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 입력 오류 : " + e.getMessage());
 
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 비품 수정 함수
+    public static void updateItem(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n수정할 비품 번호 : ");
+            int item_id = sc.nextInt();
+
+            String query = "SELECT * FROM Item WHERE item_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, item_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 수정 실패 : 해당 비품 번호가 존재하지 않습니다.");
+                return;
+            }
+
+            System.out.print("비품 이름 : ");
+            String item_name = sc.next();
+            System.out.print("비품 날짜(YYYY-MM-DD) : ");
+            String item_date = sc.next();
+            java.sql.Date sql_date = java.sql.Date.valueOf(item_date);
+            System.out.print("비품 개수 : ");
+            int total_num = sc.nextInt();
+
+            String updateQuery = "UPDATE Item SET item_name = ?, item_date = ?, total_num = ? WHERE item_id = ?;";
+            PreparedStatement updatePstmt = con.prepareStatement(updateQuery);
+            updatePstmt.setString(1, item_name);
+            updatePstmt.setDate(2, sql_date);
+            updatePstmt.setInt(3, total_num);
+            updatePstmt.setInt(4, item_id);
+
+            updatePstmt.executeUpdate();
+            System.out.println(">> Item 테이블의 데이터를 성공적으로 수정했습니다.");
+
+            pstmt.close();
+            updatePstmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터 수정 실패 : " + e.getMessage());
+            
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
