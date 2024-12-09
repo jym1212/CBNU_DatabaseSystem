@@ -128,19 +128,19 @@ public class main_menu {
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Professor (prof_id VARCHAR(12) NOT NULL PRIMARY KEY, prof_name VARCHAR(10) NOT NULL, email VARCHAR(30), lab_name VARCHAR(20), lab_num INT)");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Club (club_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, club_name VARCHAR(20) NOT NULL, room_num INT, total_num INT, prof_id VARCHAR(10), FOREIGN KEY (prof_id) REFERENCES Professor(prof_id))");
+                    "CREATE TABLE IF NOT EXISTS Club (club_id INT NOT NULL PRIMARY KEY, club_name VARCHAR(20) NOT NULL, room_num INT, total_num INT, prof_id VARCHAR(10), FOREIGN KEY (prof_id) REFERENCES Professor(prof_id))");
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Student (stu_id VARCHAR(12) NOT NULL PRIMARY KEY, stu_name VARCHAR(10) NOT NULL, stu_phone VARCHAR(15), stu_grade INT, stu_dept VARCHAR(20), stu_state VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Manager (man_id VARCHAR(12) NOT NULL PRIMARY KEY, man_name VARCHAR(10) NOT NULL, man_phone VARCHAR(15), man_grade INT, man_dept VARCHAR(20), position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Event (event_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Event (event_id INT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Project (project_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Project (project_id INT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Item (item_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, item_name VARCHAR(20) NOT NULL, item_date DATE, total_num INT, man_id VARCHAR(10), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
+                    "CREATE TABLE IF NOT EXISTS Item (item_id INT NOT NULL PRIMARY KEY, item_name VARCHAR(20) NOT NULL, item_date DATE, total_num INT, man_id VARCHAR(10), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Participate (stu_id VARCHAR(10) NOT NULL, event_id INT NOT NULL, PRIMARY KEY (stu_id, event_id), total_num INT, FOREIGN KEY (stu_id) REFERENCES Student(stu_id), FOREIGN KEY (event_id) REFERENCES Event(event_id))");
+                    "CREATE TABLE IF NOT EXISTS Participate (event_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (event_id, stu_id), total_num INT, FOREIGN KEY (event_id) REFERENCES Event(event_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Work_On (project_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (project_id, stu_id), total_num INT, FOREIGN KEY (project_id) REFERENCES Project(project_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
             stmt.close();
