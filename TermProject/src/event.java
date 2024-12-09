@@ -11,11 +11,15 @@ public class event {
             System.out.println("===============================");
             System.out.println("1. 행사 목록 출력");
             System.out.println("2. 행사 추가");
-            System.out.println("3. 행사 학생 추가");
-            System.out.println("4. 행사 수정");
-            System.out.println("5. 행사 삭제");
-            System.out.println("6. 행사 검색");
-            System.out.println("7. 메인 메뉴로 돌아가기");
+            System.out.println("3. 행사 수정");
+            System.out.println("4. 행사 삭제");
+            System.out.println("5. 행사 검색");
+            System.out.println("===============================");
+            System.out.println("6. 행사 참여 학생 목록 출력");
+            System.out.println("7. 행사 참여 학생 추가");
+            System.out.println("8. 행사 참여 학생 삭제");
+            System.out.println("9. 행사 참여 학생 검색");
+            System.out.println("10. 메인 메뉴로 돌아가기");
             System.out.print(">> 메뉴 선택 : ");
 
             menu = sc.nextInt();
@@ -28,15 +32,18 @@ public class event {
                     insertEvent(con, sc);
                     break;
                 case 3:
-                    insertParticipate(con, sc);
-                    break;
-                case 4:
                     updateEvent(con, sc);
                     break;
-                case 5:
+                case 4:
                     deleteEvent(con, sc);
                     break;
+                case 6:
+                    selectALLParticipate(con, sc);
+                    break;
                 case 7:
+                    insertParticipate(con, sc);
+                    break;
+                case 10:
                     return;
                 default:
                     System.out.println("잘못된 메뉴 선택입니다.");
@@ -102,11 +109,54 @@ public class event {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
         }
     }
+
+    // 전체 행사 참여 학생 목록 출력 함수
+    public static void selectALLParticipate(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n출력할 행사 번호 : ");
+            int search_event_id = sc.nextInt();
+
+            String query = "SELECT * FROM Participate WHERE event_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, search_event_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 조회 실패 : 해당 행사 번호에 참여 학생이 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print("\n------------------------------\n");
+            System.out.printf("| %s | %s |\n",
+                    formatString("행사 번호", 10),
+                    formatString("학생 번호", 13));
+            System.out.println("------------------------------");
+
+            do {
+                String event_id = formatString(rs.getString(1), 10);
+                String stu_id = formatString(rs.getString(2), 13);
+                System.out.printf("| %s | %s |\n", event_id, stu_id);
+            } while (rs.next());
+            System.out.println(
+                    "------------------------------");
+
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
     
     // 행사 추가 함수 
     public static void insertEvent(Connection con, Scanner sc) {
         try {
-            String valid_stu_id = null;
             Integer valid_club_id = null;
 
             System.out.print("동아리 코드 : ");
