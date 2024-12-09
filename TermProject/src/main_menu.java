@@ -134,15 +134,15 @@ public class main_menu {
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Manager (man_id VARCHAR(12) NOT NULL PRIMARY KEY, man_name VARCHAR(10) NOT NULL, man_phone VARCHAR(15), man_grade INT, man_dept VARCHAR(20), position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Event (event_id INT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Event (event_id INT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, total_num INT, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Project (project_id INT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
+                    "CREATE TABLE IF NOT EXISTS Project (project_id INT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, total_num INT, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Item (item_id INT NOT NULL PRIMARY KEY, item_name VARCHAR(20) NOT NULL, item_date DATE, total_num INT, man_id VARCHAR(10), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Participate (event_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (event_id, stu_id), total_num INT, FOREIGN KEY (event_id) REFERENCES Event(event_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
+                    "CREATE TABLE IF NOT EXISTS Participate (event_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (event_id, stu_id), FOREIGN KEY (event_id) REFERENCES Event(event_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Work_On (project_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (project_id, stu_id), total_num INT, FOREIGN KEY (project_id) REFERENCES Project(project_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
+                    "CREATE TABLE IF NOT EXISTS Work_On (project_id INT NOT NULL, stu_id VARCHAR(10) NOT NULL, PRIMARY KEY (project_id, stu_id), FOREIGN KEY (project_id) REFERENCES Project(project_id), FOREIGN KEY (stu_id) REFERENCES Student(stu_id))");
             stmt.close();
         } catch (Exception e) {
             System.out.println("Database Connection Error: " + e);
