@@ -28,6 +28,9 @@ public class project {
                 case 1:
                     selectALLProject(con);
                     break;
+                case 2:
+                    insertProject(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -50,19 +53,19 @@ public class project {
     
     // 전체 프로젝트 목록 출력 함수
     public static void selectALLProject(Connection con) {
-        try{
+        try {
             String query = "SELECT * FROM Project ORDER BY club_id, project_id";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
-            if(!rs.next()){
+            if (!rs.next()) {
                 System.out.print("\n>> 프로젝트 목록이 존재하지 않습니다.\n");
                 stmt.close();
                 return;
             }
 
             System.out.print(
-                    "\n------------------------------------------------------------------------------------------\n");
+                    "\n---------------------------------------------------------------------------------------------\n");
             System.out.printf("| %s | %s | %s | %s | %s |\n",
                     formatString("프로젝트 번호", 10),
                     formatString("프로젝트 이름", 30),
@@ -70,19 +73,20 @@ public class project {
                     formatString("인원수", 5),
                     formatString("동아리 번호", 13));
             System.out.println(
-                    "------------------------------------------------------------------------------------------");
+                    "---------------------------------------------------------------------------------------------");
 
             do {
-                String project_id = formatString(rs.getString(1), 10);
+                String project_id = formatString(rs.getString(1), 13);
                 String project_name = formatString(rs.getString(2), 30);
                 String project_date = formatString(rs.getString(3), 15);
                 String total_num = formatString(rs.getString(4), 6);
                 String club_id = formatString(rs.getString(5), 13);
-                System.out.printf("| %s | %s | %s | %s | %s |\n", project_id, project_name, project_date, total_num, club_id);
+                System.out.printf("| %s | %s | %s | %s | %s |\n", project_id, project_name, project_date, total_num,
+                        club_id);
             } while (rs.next());
             System.out.println(
-                    "------------------------------------------------------------------------------------------");
-            
+                    "---------------------------------------------------------------------------------------------");
+
             stmt.close();
 
         } catch (SQLSyntaxErrorException e) {
@@ -90,6 +94,65 @@ public class project {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 프로젝트 추가 함수
+    public static void insertProject(Connection con, Scanner sc) {
+        try{
+            Integer valid_club_id = null;
+
+            System.out.print("\n동아리 코드 : ");
+            int club_id = sc.nextInt();
+
+            String query = "SELECT club_id FROM Club WHERE club_id = ?;";
+            try(PreparedStatement pstmt = con.prepareStatement(query)){
+                pstmt.setInt(1, club_id);
+                ResultSet rs = pstmt.executeQuery();
+                if(!rs.next()){
+                    System.out.print("\n>> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.\n");
+                    pstmt.close();
+                    return;
+                } else{
+                    valid_club_id = club_id;
+                    pstmt.close();
+                }
+            }
+
+            System.out.print("\n프로젝트 번호 : ");
+            int project_id = sc.nextInt();
+            System.out.print("프로젝트 이름 : ");
+            String project_name = sc.next();
+            System.out.print("프로젝트 날짜(YYYY-MM-DD) : ");
+            String project_date = sc.next();
+            java.sql.Date sql_date = java.sql.Date.valueOf(project_date);
+            System.out.print("인원수 : ");
+            int total_num = sc.nextInt();
+
+            String insertQuery = "INSERT INTO Project (project_id, project_name, project_date, total_num, club_id) VALUES(?, ?, ?, ?, ?);";
+            PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+            insertPstmt.setInt(1, project_id);
+            insertPstmt.setString(2, project_name);
+            insertPstmt.setDate(3, sql_date);
+            insertPstmt.setInt(4, total_num);
+            insertPstmt.setInt(5, valid_club_id);
+
+            insertPstmt.executeUpdate();
+            System.out.println(">> Project 테이블에 데이터를 성공적으로 삽입했습니다.");
+        
+            insertPstmt.close();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println(">> 데이터 삽입 실패 : 프로젝트 번호가 이미 존재합니다.");
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 입력 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
