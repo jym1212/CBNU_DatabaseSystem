@@ -26,6 +26,9 @@ public class event {
                 case 2:
                     insertEvent(con, sc);
                     break;
+                case 3:
+                    updateEvent(con, sc);
+                    break;
                 case 6:
                     return;
                 default:
@@ -96,7 +99,7 @@ public class event {
     
     // 행사 추가 함수 
     public static void insertEvent(Connection con, Scanner sc) {
-        try{
+        try {
             String valid_stu_id = null;
             Integer valid_club_id = null;
 
@@ -117,7 +120,7 @@ public class event {
 
                 }
             }
-            
+
             System.out.print("주최 학생 번호 : ");
             String stu_id = sc.next();
             int stu_club_id;
@@ -143,8 +146,7 @@ public class event {
                     pstmt2.close();
                 }
             }
-            
-            
+
             System.out.print("\n행사 번호 : ");
             int event_id = sc.nextInt();
             System.out.print("행사 이름 : ");
@@ -154,7 +156,7 @@ public class event {
             java.sql.Date sql_date = java.sql.Date.valueOf(event_date);
             System.out.print("인원수 : ");
             int total_num = sc.nextInt();
-            
+
             String insertQuery1 = "INSERT INTO Event (event_id, event_name, event_date, club_id) VALUES (?, ?, ?, ?);";
             PreparedStatement insertPstmt1 = con.prepareStatement(insertQuery1);
             insertPstmt1.setInt(1, event_id);
@@ -185,6 +187,63 @@ public class event {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 입력 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 행사 수정 함수
+    public static void updateEvent(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n수정할 행사 번호 : ");
+            int event_id = sc.nextInt();
+
+            String query = "SELECT * FROM Event WHERE event_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, event_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 수정 실패 : 해당 행사 번호가 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print("행사 이름 : ");
+            String event_name = sc.next();
+            System.out.print("행사 날짜(YYYY-MM-DD) : ");
+            String event_date = sc.next();
+            java.sql.Date sql_date = java.sql.Date.valueOf(event_date);
+            System.out.print("인원수 : ");
+            int total_num = sc.nextInt();
+
+            String updateQuery1 = "UPDATE Event SET event_name = ?, event_date = ? WHERE event_id = ?;";
+            PreparedStatement updatePstmt1 = con.prepareStatement(updateQuery1);
+            updatePstmt1.setString(1, event_name);
+            updatePstmt1.setDate(2, sql_date);
+            updatePstmt1.setInt(3, event_id);
+
+            updatePstmt1.executeUpdate();
+
+            String updateQuery2 = "UPDATE Participate SET total_num = ? WHERE event_id = ?;";
+            PreparedStatement updatePstmt2 = con.prepareStatement(updateQuery2);
+            updatePstmt2.setInt(1, total_num);
+            updatePstmt2.setInt(2, event_id);
+
+            updatePstmt2.executeUpdate();
+
+            System.out.println(">> Event, Participate 테이블에 데이터를 성공적으로 수정했습니다.");
+
+            pstmt.close();
+            updatePstmt1.close();
+            updatePstmt2.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 수정 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
