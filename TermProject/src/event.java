@@ -49,6 +49,9 @@ public class event {
                 case 8:
                     deleteParticipate(con, sc);
                     break;
+                case 9:
+                    selectParticipate(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -421,7 +424,7 @@ public class event {
 
     // 행사 참여 학생 삭제 함수
     public static void deleteParticipate(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n삭제할 학생 번호 : ");
             String stu_id = sc.next();
 
@@ -430,7 +433,7 @@ public class event {
             pstmt1.setString(1, stu_id);
             ResultSet rs1 = pstmt1.executeQuery();
 
-            if(!rs1.next()){
+            if (!rs1.next()) {
                 System.out.print("\n>> 데이터 삭제 실패 : 해당 학생 번호가 존재하지 않습니다.\n");
                 pstmt1.close();
                 return;
@@ -445,7 +448,7 @@ public class event {
             pstmt2.setString(2, stu_id);
             ResultSet rs2 = pstmt2.executeQuery();
 
-            if(!rs2.next()){
+            if (!rs2.next()) {
                 System.out.print("\n>> 데이터 삭제 실패 : 해당 학생이 해당 행사에 참여하지 않았습니다.\n");
                 pstmt1.close();
                 pstmt2.close();
@@ -469,6 +472,50 @@ public class event {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 삭제 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+
+    // 행사 참여 학생 검색 함수
+    public static void selectParticipate(Connection con, Scanner sc) {
+        try {
+            System.out.print("\n검색할 학생 번호 : ");
+            String search_stu_id = sc.next();
+
+            String query = "SELECT * FROM Participate WHERE stu_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, search_stu_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.print("\n>> 데이터 조회 실패 : 해당 학생 번호가 존재하지 않습니다.\n");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print("\n------------------------------\n");
+            System.out.printf("| %s | %s |\n",
+                    formatString("행사 번호", 10),
+                    formatString("학생 번호", 13));
+            System.out.println("------------------------------");
+
+            do {
+                String event_id = formatString(rs.getString(1), 10);
+                String stu_id = formatString(rs.getString(2), 13);
+                System.out.printf("| %s | %s |\n", event_id, stu_id);
+            } while (rs.next());
+            System.out.println(
+                    "------------------------------");
+
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
