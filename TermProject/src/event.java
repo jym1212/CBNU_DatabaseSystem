@@ -29,6 +29,9 @@ public class event {
                 case 3:
                     updateEvent(con, sc);
                     break;
+                case 4:
+                    deleteEvent(con, sc);
+                    break;
                 case 6:
                     return;
                 default:
@@ -195,7 +198,7 @@ public class event {
     
     // 행사 수정 함수
     public static void updateEvent(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n수정할 행사 번호 : ");
             int event_id = sc.nextInt();
 
@@ -244,6 +247,52 @@ public class event {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 수정 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 행사 삭제 함수
+    public static void deleteEvent(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n삭제할 행사 번호 : ");
+            int event_id = sc.nextInt();
+
+            String query = "SELECT * FROM Event WHERE event_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, event_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 삭제 실패 : 해당 행사 번호가 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            String deleteQuery1 = "DELETE FROM Participate WHERE event_id = ?;";
+            PreparedStatement deletePstmt1 = con.prepareStatement(deleteQuery1);
+            deletePstmt1.setInt(1, event_id);
+
+            deletePstmt1.executeUpdate();
+
+            String deleteQuery2 = "DELETE FROM Event WHERE event_id = ?;";
+            PreparedStatement deletePstmt2 = con.prepareStatement(deleteQuery2);
+            deletePstmt2.setInt(1, event_id);
+
+            deletePstmt2.executeUpdate();
+
+            System.out.println(">> Event, Participate 테이블에 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
+            deletePstmt1.close();
+            deletePstmt2.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 삭제 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
