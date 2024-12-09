@@ -245,11 +245,23 @@ public class event {
                 return;
             }
 
-            String deleteQuery1 = "DELETE FROM Participate WHERE event_id = ?;";
-            PreparedStatement deletePstmt1 = con.prepareStatement(deleteQuery1);
-            deletePstmt1.setInt(1, event_id);
+            try{
+                String deleteQuery1 = "DELETE FROM Participate WHERE event_id = ?;";
+                PreparedStatement deletePstmt1 = con.prepareStatement(deleteQuery1);
+                deletePstmt1.setInt(1, event_id);
 
-            deletePstmt1.executeUpdate();
+                deletePstmt1.executeUpdate();
+                deletePstmt1.close();
+
+                System.out.print("\n>> Participate 테이블에서 관련 데이터를 삭제했습니다.\n");
+            
+            } catch (SQLException e) {
+                if (e.getMessage().contains("doesn't exist")) {
+                    System.out.print("\n>> Participate 테이블이 존재하지 않아 삭제를 하지 않습니다.\n");
+                } else {
+                    throw e; 
+                }
+            }
 
             String deleteQuery2 = "DELETE FROM Event WHERE event_id = ?;";
             PreparedStatement deletePstmt2 = con.prepareStatement(deleteQuery2);
@@ -260,7 +272,6 @@ public class event {
             System.out.println(">> Event, Participate 테이블에 데이터를 성공적으로 삭제했습니다.");
 
             pstmt.close();
-            deletePstmt1.close();
             deletePstmt2.close();
 
         } catch (SQLSyntaxErrorException e) {
