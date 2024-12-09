@@ -64,6 +64,14 @@ public class main_menu {
                         System.out.println("동아리 관리 DB와 먼저 연결해주세요.");
                     }
                     break;
+                case 6:
+                    if (con != null) {
+                        event.event_menu(con, sc);
+                    } else {
+                        System.out.println("동아리 관리 DB와 연결되어 있지 않습니다.");
+                        System.out.println("동아리 관리 DB와 먼저 연결해주세요.");
+                    }
+                    break;
                 case 8:
                     if (con != null) {
                         item.item_menu(con, sc);
@@ -103,7 +111,7 @@ public class main_menu {
 
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(
-                    "jdbc:mysql://192.168.56.107:4567/",
+                    "jdbc:mysql://192.168.56.108:4568/",
                     "yunmin", "1212");
             init_clubDB(con);
         } catch (Exception e) {
@@ -126,9 +134,9 @@ public class main_menu {
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Manager (man_id VARCHAR(12) NOT NULL PRIMARY KEY, man_name VARCHAR(10) NOT NULL, man_phone VARCHAR(15), man_grade INT, man_dept VARCHAR(20), position VARCHAR(10), club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Event (event_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, host VARCHAR(10))");
+                    "CREATE TABLE IF NOT EXISTS Event (event_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, event_name VARCHAR(20) NOT NULL, event_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS Project (project_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, host VARCHAR(10))");
+                    "CREATE TABLE IF NOT EXISTS Project (project_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, project_name VARCHAR(30) NOT NULL, project_date DATE, club_id INT, FOREIGN KEY (club_id) REFERENCES Club(club_id))");
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS Item (item_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, item_name VARCHAR(20) NOT NULL, item_date DATE, total_num INT, man_id VARCHAR(10), FOREIGN KEY (man_id) REFERENCES Manager(man_id))");
             stmt.executeUpdate(
