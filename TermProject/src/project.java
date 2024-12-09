@@ -49,6 +49,9 @@ public class project {
                 case 8:
                     deleteWorkOn(con, sc);
                     break;
+                case 9:
+                    selectWorkOn(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -439,7 +442,7 @@ public class project {
     
     // 프로젝트 참여 학생 삭제 함수
     public static void deleteWorkOn(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n삭제할 학생 번호 : ");
             String stu_id = sc.next();
 
@@ -448,7 +451,7 @@ public class project {
             pstmt1.setString(1, stu_id);
             ResultSet rs1 = pstmt1.executeQuery();
 
-            if(!rs1.next()){
+            if (!rs1.next()) {
                 System.out.println(">> 데이터 삭제 실패 : 학생 번호가 존재하지 않습니다.");
                 pstmt1.close();
                 return;
@@ -463,7 +466,7 @@ public class project {
             pstmt2.setString(2, stu_id);
             ResultSet rs2 = pstmt2.executeQuery();
 
-            if(!rs2.next()){
+            if (!rs2.next()) {
                 System.out.println(">> 데이터 삭제 실패 : 프로젝트 번호와 학생 번호가 일치하는 데이터가 존재하지 않습니다.");
                 pstmt1.close();
                 pstmt2.close();
@@ -487,6 +490,51 @@ public class project {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 삭제 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 프로젝트 참여 학생 검색 함수
+    public static void selectWorkOn(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n검색할 학생 번호 : ");
+            String search_stu_id = sc.next();
+
+            String query = "SELECT * FROM Work_On WHERE stu_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, search_stu_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 검색 실패 : 학생 번호가 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print("\n---------------------------------\n");
+            System.out.printf("| %s | %s |\n",
+                    formatString("프로젝트 번호", 10),
+                    formatString("학생 번호", 13));
+            System.out.println(
+                    "---------------------------------");
+
+            do {
+                String project_id = formatString(rs.getString(1), 13);
+                String stu_id = formatString(rs.getString(2), 13);
+                System.out.printf("| %s | %s |\n", project_id, stu_id);
+            } while (rs.next());
+            System.out.println(
+                    "---------------------------------");
+
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
