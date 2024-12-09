@@ -43,6 +43,9 @@ public class project {
                 case 6:
                     selectALLWorkOn(con, sc);
                     break;
+                case 7:
+                    insertWorkOn(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -330,11 +333,11 @@ public class project {
     
     // 프로젝트 참여 학생 목록 출력 함수
     public static void selectALLWorkOn(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n검색할 프로젝트 번호 : ");
             int search_project_id = sc.nextInt();
 
-            String query = "SELECT * FROM Work_on WHERE project_id = ?;";
+            String query = "SELECT * FROM Work_On WHERE project_id = ?;";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setInt(1, search_project_id);
             ResultSet rs = pstmt.executeQuery();
@@ -355,7 +358,7 @@ public class project {
             do {
                 String project_id = formatString(rs.getString(1), 13);
                 String stu_id = formatString(rs.getString(2), 13);
-                System.out.printf("| %s | %s |n", project_id, stu_id);
+                System.out.printf("| %s | %s |\n", project_id, stu_id);
             } while (rs.next());
             System.out.println(
                     "---------------------------------");
@@ -367,6 +370,64 @@ public class project {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 프로젝트 참여 학생 추가 함수
+    public static void insertWorkOn(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n프로젝트 번호 : ");
+            int project_id = sc.nextInt();
+
+            String query1 = "SELECT * FROM Project WHERE project_id = ?;";
+            PreparedStatement pstmt1 = con.prepareStatement(query1);
+            pstmt1.setInt(1, project_id);
+            ResultSet rs1 = pstmt1.executeQuery();
+
+            if (!rs1.next()) {
+                System.out.println(">> 데이터 삽입 실패 : 프로젝트 번호가 존재하지 않습니다.");
+                pstmt1.close();
+                return;
+            }
+
+            System.out.print("학생 번호 : ");
+            int stu_id = sc.nextInt();
+
+            String query2 = "SELECT * FROM Student WHERE stu_id = ?;";
+            PreparedStatement pstmt2 = con.prepareStatement(query2);
+            pstmt2.setInt(1, stu_id);
+            ResultSet rs2 = pstmt2.executeQuery();
+
+            if (!rs2.next()) {
+                System.out.println(">> 데이터 삽입 실패 : 학생 번호가 존재하지 않습니다.");
+                pstmt1.close();
+                pstmt2.close();
+                return;
+            }
+
+            String insertQuery = "INSERT INTO Work_On (project_id, stu_id) VALUES(?, ?);";
+            PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+            insertPstmt.setInt(1, project_id);
+            insertPstmt.setInt(2, stu_id);
+
+            insertPstmt.executeUpdate();
+            System.out.println(">> Work_On 테이블에 데이터를 성공적으로 삽입했습니다.");
+    
+            pstmt1.close();
+            pstmt2.close();
+            insertPstmt.close();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println(">> 데이터 삽입 실패 : 이미 존재하는 데이터입니다.");
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 입력 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
