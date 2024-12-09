@@ -34,6 +34,9 @@ public class project {
                 case 3:
                     updateProject(con, sc);
                     break;
+                case 4:
+                    deleteProject(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -164,7 +167,7 @@ public class project {
     
     // 프로젝트 수정 함수
     public static void updateProject(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n수정할 프로젝트 번호 : ");
             int project_id = sc.nextInt();
 
@@ -204,6 +207,60 @@ public class project {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 수정 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 프로젝트 삭제 함수
+    public static void deleteProject(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n삭제할 프로젝트 번호 : ");
+            int project_id = sc.nextInt();
+
+            String query = "SELECT * FROM Project WHERE project_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, project_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.print("\n>> 데이터 삭제 실패 : 프로젝트 번호가 존재하지 않습니다.\n");
+                pstmt.close();
+                return;
+            }
+
+            try {
+                String deleteQuery1 = "DELETE FROM Work_on WHERE project_id = ?;";
+                PreparedStatement deletePstmt1 = con.prepareStatement(deleteQuery1);
+                deletePstmt1.setInt(1, project_id);
+
+                deletePstmt1.executeUpdate();
+                deletePstmt1.close();
+
+                System.out.print("\n>> Work_on 테이블에서 관련 데이터를 삭제했습니다.\n");
+        
+            } catch (SQLException e) {
+                if (e.getMessage().contains("doesn't exist")) {
+                    System.out.print("\n>> Work_on 테이블이 존재하지 않아 삭제를 하지 않습니다.\n");
+                } else {
+                    throw e; 
+                }
+            }
+
+            String deleteQuery2 = "DELETE FROM Project WHERE project_id = ?;";
+            PreparedStatement deletePstmt2 = con.prepareStatement(deleteQuery2);
+            deletePstmt2.setInt(1, project_id);
+            deletePstmt2.executeUpdate();
+
+            System.out.println(">> Project 테이블에서 데이터를 성공적으로 삭제했습니다.");
+            deletePstmt2.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 삭제 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
