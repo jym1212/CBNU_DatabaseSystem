@@ -40,6 +40,9 @@ public class project {
                 case 5:
                     selectProject(con, sc);
                     break;
+                case 6:
+                    selectALLWorkOn(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -274,7 +277,7 @@ public class project {
     
     // 프로젝트 검색 함수  
     public static void selectProject(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n검색할 프로젝트 번호 : ");
             int project_id = sc.nextInt();
 
@@ -311,6 +314,51 @@ public class project {
             } while (rs.next());
             System.out.println(
                     "---------------------------------------------------------------------------------------------");
+
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 프로젝트 참여 학생 목록 출력 함수
+    public static void selectALLWorkOn(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n검색할 프로젝트 번호 : ");
+            int search_project_id = sc.nextInt();
+
+            String query = "SELECT * FROM Work_on WHERE project_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, search_project_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.print("\n>> 프로젝트 참여 학생 목록이 존재하지 않습니다.\n");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print("\n---------------------------------\n");
+            System.out.printf("| %s | %s |\n",
+                    formatString("프로젝트 번호", 10),
+                    formatString("학생 번호", 13));
+            System.out.println(
+                    "---------------------------------");
+
+            do {
+                String project_id = formatString(rs.getString(1), 13);
+                String stu_id = formatString(rs.getString(2), 13);
+                System.out.printf("| %s | %s |n", project_id, stu_id);
+            } while (rs.next());
+            System.out.println(
+                    "---------------------------------");
 
             pstmt.close();
 
