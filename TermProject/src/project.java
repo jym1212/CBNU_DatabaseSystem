@@ -37,6 +37,9 @@ public class project {
                 case 4:
                     deleteProject(con, sc);
                     break;
+                case 5:
+                    selectProject(con, sc);
+                    break;
                 case 10:
                     return;
                 default:
@@ -215,7 +218,7 @@ public class project {
     
     // 프로젝트 삭제 함수
     public static void deleteProject(Connection con, Scanner sc) {
-        try{
+        try {
             System.out.print("\n삭제할 프로젝트 번호 : ");
             int project_id = sc.nextInt();
 
@@ -239,12 +242,12 @@ public class project {
                 deletePstmt1.close();
 
                 System.out.print("\n>> Work_on 테이블에서 관련 데이터를 삭제했습니다.\n");
-        
+
             } catch (SQLException e) {
                 if (e.getMessage().contains("doesn't exist")) {
                     System.out.print("\n>> Work_on 테이블이 존재하지 않아 삭제를 하지 않습니다.\n");
                 } else {
-                    throw e; 
+                    throw e;
                 }
             }
 
@@ -254,6 +257,8 @@ public class project {
             deletePstmt2.executeUpdate();
 
             System.out.println(">> Project 테이블에서 데이터를 성공적으로 삭제했습니다.");
+
+            pstmt.close();
             deletePstmt2.close();
 
         } catch (SQLSyntaxErrorException e) {
@@ -261,6 +266,59 @@ public class project {
 
         } catch (SQLException e) {
             System.out.println(">> 데이터베이스 삭제 오류 : " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
+        }
+    }
+    
+    // 프로젝트 검색 함수  
+    public static void selectProject(Connection con, Scanner sc) {
+        try{
+            System.out.print("\n검색할 프로젝트 번호 : ");
+            int project_id = sc.nextInt();
+
+            String query = "SELECT * FROM Project WHERE project_id = ?;";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, project_id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println(">> 데이터 검색 실패 : 프로젝트 번호가 존재하지 않습니다.");
+                pstmt.close();
+                return;
+            }
+
+            System.out.print(
+                    "\n---------------------------------------------------------------------------------------------\n");
+            System.out.printf("| %s | %s | %s | %s | %s |\n",
+                    formatString("프로젝트 번호", 10),
+                    formatString("프로젝트 이름", 30),
+                    formatString("프로젝트 날짜", 15),
+                    formatString("인원수", 5),
+                    formatString("동아리 번호", 13));
+            System.out.println(
+                    "---------------------------------------------------------------------------------------------");
+
+            do {
+                String project_id_str = formatString(rs.getString(1), 13);
+                String project_name = formatString(rs.getString(2), 30);
+                String project_date = formatString(rs.getString(3), 15);
+                String total_num = formatString(rs.getString(4), 6);
+                String club_id = formatString(rs.getString(5), 13);
+                System.out.printf("| %s | %s | %s | %s | %s |\n", project_id_str, project_name, project_date, total_num,
+                        club_id);
+            } while (rs.next());
+            System.out.println(
+                    "---------------------------------------------------------------------------------------------");
+
+            pstmt.close();
+
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println(">> SQL 문법 오류 : " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println(">> 데이터베이스 조회 오류 : " + e.getMessage());
 
         } catch (Exception e) {
             System.out.println(">> 예상치 못한 오류 : " + e.getMessage());
