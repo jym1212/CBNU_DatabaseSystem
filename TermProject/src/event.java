@@ -75,7 +75,7 @@ public class event {
     // 전체 행사 목록 출력 함수
     public static void selectALLEvent(Connection con) {
         try {
-            String query = "SELECT * FROM Event ORDER BY club_id, event_id;";
+            String query = "SELECT * FROM Event ORDER BY club_id, event_id ASC;";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -123,27 +123,43 @@ public class event {
     public static void insertEvent(Connection con, Scanner sc) {
         try {
             Integer valid_club_id = null;
+            Integer valid_event_id = null;
 
             System.out.print("\n동아리 코드 : ");
             int club_id = sc.nextInt();
 
-            String query = "SELECT club_id FROM Club WHERE club_id = ?;";
-            try (PreparedStatement pstmt = con.prepareStatement(query)) {
-                pstmt.setInt(1, club_id);
-                ResultSet rs = pstmt.executeQuery();
-                if (!rs.next()) {
-                    System.out.print("\n>> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.\n");
-                    pstmt.close();
+            String query1 = "SELECT club_id FROM Club WHERE club_id = ?;";
+            try (PreparedStatement pstmt1 = con.prepareStatement(query1)) {
+                pstmt1.setInt(1, club_id);
+                ResultSet rs1 = pstmt1.executeQuery();
+                if (!rs1.next()) {
+                    System.out.print("\n>> 동아리 번호가 존재하지 않습니다.\n");
+                    pstmt1.close();
                     return;
                 } else {
                     valid_club_id = club_id;
-                    pstmt.close();
+                    pstmt1.close();
 
                 }
             }
 
             System.out.print("\n행사 번호 : ");
             int event_id = sc.nextInt();
+
+            String query2 = "SELECT * FROM Event WHERE event_id = ?;";
+            PreparedStatement pstmt2 = con.prepareStatement(query2);
+            pstmt2.setInt(1, event_id);
+            ResultSet rs2 = pstmt2.executeQuery();
+
+            if (rs2.next()) {
+                System.out.print("\n>> 이미 존재하는 행사 번호입니다.\n");
+                pstmt2.close();
+                return;
+            } else {
+                valid_event_id = event_id;
+                pstmt2.close();
+            }
+            
             System.out.print("행사 이름 : ");
             String event_name = sc.next();
             System.out.print("행사 날짜(YYYY-MM-DD) : ");
@@ -154,7 +170,7 @@ public class event {
 
             String insertQuery = "INSERT INTO Event (event_id, event_name, event_date, total_num, club_id) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
-            insertPstmt.setInt(1, event_id);
+            insertPstmt.setInt(1, valid_event_id);
             insertPstmt.setString(2, event_name);
             insertPstmt.setDate(3, sql_date);
             insertPstmt.setInt(4, total_num);
@@ -164,9 +180,6 @@ public class event {
             System.out.println(">> Event 테이블에 데이터를 성공적으로 삽입했습니다.");
 
             insertPstmt.close();
-
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println(">> 데이터 삽입 실패 : 행사 번호가 이미 존재합니다.");
 
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
@@ -191,7 +204,7 @@ public class event {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 수정 실패 : 해당 행사 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 행사 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -240,7 +253,7 @@ public class event {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 삭제 실패 : 해당 행사 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 행사 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -269,7 +282,7 @@ public class event {
 
             deletePstmt2.executeUpdate();
 
-            System.out.println(">> Event, Participate 테이블에 데이터를 성공적으로 삭제했습니다.");
+            System.out.println(">> Event 테이블에 데이터를 성공적으로 삭제했습니다.");
 
             pstmt.close();
             deletePstmt2.close();
@@ -297,7 +310,7 @@ public class event {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 조회 실패 : 해당 행사 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 행사 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -346,7 +359,7 @@ public class event {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 조회 실패 : 해당 행사 번호에 참여 학생이 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 행사 번호에 참여 학생이 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -390,7 +403,7 @@ public class event {
             ResultSet rs = pstmt1.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 삽입 실패 : 해당 행사 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 행사 번호가 존재하지 않습니다.\n");
                 pstmt1.close();
                 return;
             }
@@ -404,7 +417,7 @@ public class event {
             ResultSet rs2 = pstmt2.executeQuery();
 
             if (!rs2.next()) {
-                System.out.print("\n>> 데이터 삽입 실패 : 해당 학생 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 학생 번호가 존재하지 않습니다.\n");
                 pstmt2.close();
                 return;
             }
@@ -445,7 +458,7 @@ public class event {
             ResultSet rs1 = pstmt1.executeQuery();
 
             if (!rs1.next()) {
-                System.out.print("\n>> 데이터 삭제 실패 : 해당 학생 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 학생 번호가 존재하지 않습니다.\n");
                 pstmt1.close();
                 return;
             }
@@ -460,7 +473,7 @@ public class event {
             ResultSet rs2 = pstmt2.executeQuery();
 
             if (!rs2.next()) {
-                System.out.print("\n>> 데이터 삭제 실패 : 해당 학생이 해당 행사에 참여하지 않았습니다.\n");
+                System.out.print("\n>> 해당 학생이 해당 행사에 참여하지 않았습니다.\n");
                 pstmt1.close();
                 pstmt2.close();
                 return;
@@ -501,7 +514,7 @@ public class event {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 조회 실패 : 해당 학생 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 해당 학생 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }

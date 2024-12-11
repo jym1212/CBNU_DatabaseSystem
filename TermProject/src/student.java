@@ -2,8 +2,6 @@ import java.util.Scanner;
 import java.sql.*;
 
 public class student {
-    static int invalid = 0;
-
     public static void student_menu(Connection con, Scanner sc) {
         int menu = 0;
 
@@ -60,7 +58,7 @@ public class student {
     // 전체 회원 목록 출력 함수
     public static void selectALLStudent(Connection con, Scanner sc) {
         try {
-            String query = "SELECT * FROM Student ORDER BY club_id, stu_id;";
+            String query = "SELECT * FROM Student ORDER BY club_id, stu_id ASC;";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -109,8 +107,37 @@ public class student {
     // 회원 추가 함수
     public static void insertStudent(Connection con, Scanner sc) {
         try {
-            System.out.print("\n학생 번호 : ");
+            System.out.print("\n동아리 코드 : ");
+            int club_id = sc.nextInt();
+            Integer valid_id = null;
+
+            String query1 = "SELECT club_id FROM Club WHERE club_id = ?";
+            try (PreparedStatement pstmt1 = con.prepareStatement(query1)) {
+                pstmt1.setInt(1, club_id);
+                ResultSet rs1 = pstmt1.executeQuery();
+                if (!rs1.next()) {
+                    System.out.print("\n>> 동아리 번호가 존재하지 않습니다.\n");
+                    pstmt1.close();
+                    return;
+                } else {
+                    valid_id = club_id;
+                    pstmt1.close();
+                }
+            }
+            
+            System.out.print("학생 번호 : ");
             String stu_id = sc.next();
+
+            String query2 = "SELECT club_id FROM Student WHERE stu_id = ?";
+            try (PreparedStatement pstmt2 = con.prepareStatement(query2)) {
+                pstmt2.setString(1, stu_id);
+                ResultSet rs2 = pstmt2.executeQuery();
+                if (rs2.next()) {
+                    System.out.print("\n>> 이미 다른 동아리에 가입된 학생입니다.\n");
+                    return;
+                }
+            }
+            
             System.out.print("학생 이름 : ");
             String stu_name = sc.next();
             System.out.print("전화번호 : ");
@@ -121,24 +148,6 @@ public class student {
             String stu_dept = sc.next();
             System.out.print("학생 상태 : ");
             String stu_state = sc.next();
-
-            System.out.print("동아리 코드 : ");
-            int club_id = sc.nextInt();
-            Integer valid_id = null;
-
-            String checkQuery = "SELECT club_id FROM Club WHERE club_id = ?";
-            try (PreparedStatement checkPstmt = con.prepareStatement(checkQuery)) {
-                checkPstmt.setInt(1, club_id);
-                ResultSet check_rs = checkPstmt.executeQuery();
-                if (!check_rs.next()) {
-                    System.out.println(">> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.");
-                    checkPstmt.close();
-                    return;
-                } else {
-                    valid_id = club_id;
-                    checkPstmt.close();
-                }
-            }
 
             String query = "INSERT INTO Student (stu_id, stu_name, stu_phone, stu_grade, stu_dept, stu_state, club_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
@@ -156,7 +165,7 @@ public class student {
             pstmt.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println(">> 데이터 삽입 실패 : 동아리 코드가 이미 존재합니다.");
+            System.out.println(">> 데이터 삽입 실패 : 학생 번호가 이미 존재합니다.");
 
         } catch (SQLException e) {
             System.out.println(">> 데이터 삽입 실패 : " + e.getMessage());
@@ -178,7 +187,7 @@ public class student {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 해당 학생 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 학생 번호가 존재하지 않습니다.\n");
                 return;
             }
 
@@ -228,7 +237,7 @@ public class student {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 해당 학생 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 학생 번호가 존재하지 않습니다.\n");
                 return;
             }
 
@@ -253,7 +262,7 @@ public class student {
     // 회원 검색 함수
     public static void selectStudent(Connection con, Scanner sc) {
         try{
-            System.out.print("\n검색할 회원 번호 : ");
+            System.out.print("\n검색할 학생 번호 : ");
             String search_stu_id = sc.next();
 
             String query = "SELECT * FROM Student WHERE stu_id = ?;";
@@ -262,7 +271,7 @@ public class student {
             ResultSet rs = pstmt.executeQuery();
 
             if(!rs.next()){
-                System.out.println(">> 해당 회원 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 학생 번호가 존재하지 않습니다.\n");
                 return;
             }
 

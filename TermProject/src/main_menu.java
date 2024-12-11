@@ -8,16 +8,16 @@ public class main_menu {
         Scanner sc = new Scanner(System.in);
         
         while (true) {
-            System.out.print("\n\n=====================================================\n");
+            System.out.print("\n\n=======================================================\n");
             System.out.println("    충북대학교 소프트웨어학과 동아리 관리 프로그램     ");
             System.out.println("          소프트웨어학과 2021041078 정윤민           ");
-            System.out.println("=====================================================");
-            System.out.println("1. 동아리 관리 DB 연결           2. 동아리 관리");
-            System.out.println("3. 동아리 담당 교수 관리         4. 동아리 회원 관리");
-            System.out.println("5. 동아리 임원 관리              6. 동아리 행사 관리");
-            System.out.println("7. 동아리 프로젝트 관리          8. 동아리 비품 관리");
-            System.out.println("9. 동아리 관리 DB 해제           10. 프로그램 종료"); 
-            System.out.println("=====================================================");
+            System.out.println("=======================================================");
+            System.out.println("1. 동아리 관리 DB 연결         2. 동아리 담당 교수 관리");
+            System.out.println("3. 동아리 관리                 4. 동아리 회원 관리");
+            System.out.println("5. 동아리 임원 관리            6. 동아리 행사 관리");
+            System.out.println("7. 동아리 프로젝트 관리        8. 동아리 비품 관리");
+            System.out.println("9. 동아리 관리 DB 해제         10. 프로그램 종료"); 
+            System.out.println("=======================================================");
             System.out.print("메뉴 선택 : ");
 
             menu = sc.nextInt();
@@ -34,7 +34,7 @@ public class main_menu {
                     break;
                 case 2:
                     if (con != null) {
-                        club.club_menu(con, sc);
+                        professor.professor_menu(con, sc);
                     } else {
                         System.out.println("동아리 관리 DB와 연결되어 있지 않습니다.");
                         System.out.println("동아리 관리 DB와 먼저 연결해주세요.");
@@ -42,7 +42,7 @@ public class main_menu {
                     break;
                 case 3:
                     if (con != null) {
-                        professor.professor_menu(con, sc);
+                        club.club_menu(con, sc);
                     } else {
                         System.out.println("동아리 관리 DB와 연결되어 있지 않습니다.");
                         System.out.println("동아리 관리 DB와 먼저 연결해주세요.");

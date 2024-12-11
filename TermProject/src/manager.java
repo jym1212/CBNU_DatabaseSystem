@@ -58,7 +58,7 @@ public class manager {
     // 전체 임원 목록 출력 함수
     public static void selectALLManager(Connection con) {
         try {
-            String query = "SELECT * FROM Manager ORDER BY club_id, man_id";
+            String query = "SELECT * FROM Manager ORDER BY club_id, man_id ASC";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -110,8 +110,40 @@ public class manager {
     // 임원 추가 함수
     public static void insertManager(Connection con, Scanner sc) {
         try {
-            System.out.print("\n임원 번호 : ");
+            System.out.print("\n동아리 코드 : ");
+            int club_id = sc.nextInt();
+            Integer valid_id = null;
+
+            String query1 = "SELECT club_id FROM Club WHERE club_id = ?";
+            try (PreparedStatement pstmt1 = con.prepareStatement(query1)) {
+                pstmt1.setInt(1, club_id);
+                ResultSet rs = pstmt1.executeQuery();
+                if (!rs.next()) {
+                    System.out.print("\n>> 동아리 번호가 존재하지 않습니다.\n");
+                    pstmt1.close();
+                    return;
+                } else {
+                    valid_id = club_id;
+                    pstmt1.close();
+                }
+            }
+
+            System.out.print("임원 번호 : ");
             String man_id = sc.next();
+
+            String query2 = "SELECT club_id FROM Manager WHERE man_id = ?";
+            try (PreparedStatement pstmt2 = con.prepareStatement(query2)) {
+                pstmt2.setString(1, man_id);
+                ResultSet rs = pstmt2.executeQuery();
+                if (rs.next()) {
+                    System.out.print("\n>> 이미 다른 동아리에 가입된 임원 번호입니다.\n");
+                    pstmt2.close();
+                    return;
+                } else {
+                    pstmt2.close();
+                }
+            }
+
             System.out.print("임원 이름 : ");
             String man_name = sc.next();
             System.out.print("전화번호 : ");
@@ -122,24 +154,6 @@ public class manager {
             String man_dept = sc.next();
             System.out.print("임원 직책 : ");
             String position = sc.next();
-
-            System.out.print("동아리 코드 : ");
-            int club_id = sc.nextInt();
-            Integer valid_id = null;
-
-            String query = "SELECT club_id FROM Club WHERE club_id = ?";
-            try (PreparedStatement pstmt = con.prepareStatement(query)) {
-                pstmt.setInt(1, club_id);
-                ResultSet rs = pstmt.executeQuery();
-                if (!rs.next()) {
-                    System.out.println(">> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.");
-                    pstmt.close();
-                    return;
-                } else {
-                    valid_id = club_id;
-                    pstmt.close();
-                }
-            }
 
             String insertQuery = "INSERT INTO Manager (man_id, man_name, man_phone, man_grade, man_dept, position, club_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
@@ -179,7 +193,7 @@ public class manager {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 수정 실패 : 해당 임원 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 임원 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -229,7 +243,7 @@ public class manager {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 수정 실패 : 해당 임원 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 임원 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -264,7 +278,7 @@ public class manager {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 검색 실패 : 해당 임원 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 임원 번호가 존재하지 않습니다.\n");
                 return;
             }
 

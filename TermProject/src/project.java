@@ -75,7 +75,7 @@ public class project {
     // 전체 프로젝트 목록 출력 함수
     public static void selectALLProject(Connection con) {
         try {
-            String query = "SELECT * FROM Project ORDER BY club_id, project_id";
+            String query = "SELECT * FROM Project ORDER BY club_id, project_id ASC";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -129,22 +129,34 @@ public class project {
             System.out.print("\n동아리 코드 : ");
             int club_id = sc.nextInt();
 
-            String query = "SELECT club_id FROM Club WHERE club_id = ?;";
-            try (PreparedStatement pstmt = con.prepareStatement(query)) {
-                pstmt.setInt(1, club_id);
-                ResultSet rs = pstmt.executeQuery();
+            String query1 = "SELECT club_id FROM Club WHERE club_id = ?;";
+            try (PreparedStatement pstmt1 = con.prepareStatement(query1)) {
+                pstmt1.setInt(1, club_id);
+                ResultSet rs = pstmt1.executeQuery();
                 if (!rs.next()) {
-                    System.out.print("\n>> 데이터 삽입 실패 : 동아리 번호가 존재하지 않습니다.\n");
-                    pstmt.close();
+                    System.out.print("\n>> 동아리 번호가 존재하지 않습니다.\n");
+                    pstmt1.close();
                     return;
                 } else {
                     valid_club_id = club_id;
-                    pstmt.close();
+                    pstmt1.close();
                 }
             }
 
-            System.out.print("\n프로젝트 번호 : ");
+            System.out.print("프로젝트 번호 : ");
             int project_id = sc.nextInt();
+
+            String query2 = "SELECT * FROM Project WHERE project_id = ?;";
+            PreparedStatement pstmt2 = con.prepareStatement(query2);
+            pstmt2.setInt(1, project_id);
+            ResultSet rs = pstmt2.executeQuery();
+
+            if (rs.next()) {
+                System.out.println(">> 이미 존재하는 프로젝트 번호입니다.");
+                pstmt2.close();
+                return;
+            }
+
             System.out.print("프로젝트 이름 : ");
             String project_name = sc.next();
             System.out.print("프로젝트 날짜(YYYY-MM-DD) : ");
@@ -165,9 +177,6 @@ public class project {
             System.out.println(">> Project 테이블에 데이터를 성공적으로 삽입했습니다.");
 
             insertPstmt.close();
-
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println(">> 데이터 삽입 실패 : 프로젝트 번호가 이미 존재합니다.");
 
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
@@ -192,7 +201,7 @@ public class project {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 수정 실패 : 프로젝트 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 프로젝트 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -240,7 +249,7 @@ public class project {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.print("\n>> 데이터 삭제 실패 : 프로젝트 번호가 존재하지 않습니다.\n");
+                System.out.print("\n>> 프로젝트 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -296,7 +305,7 @@ public class project {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 검색 실패 : 프로젝트 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 프로젝트 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }
@@ -394,7 +403,7 @@ public class project {
             ResultSet rs1 = pstmt1.executeQuery();
 
             if (!rs1.next()) {
-                System.out.println(">> 데이터 삽입 실패 : 프로젝트 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 프로젝트 번호가 존재하지 않습니다.\n");
                 pstmt1.close();
                 return;
             }
@@ -408,7 +417,7 @@ public class project {
             ResultSet rs2 = pstmt2.executeQuery();
 
             if (!rs2.next()) {
-                System.out.println(">> 데이터 삽입 실패 : 학생 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 학생 번호가 존재하지 않습니다.\n");
                 pstmt1.close();
                 pstmt2.close();
                 return;
@@ -427,7 +436,7 @@ public class project {
             insertPstmt.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println(">> 데이터 삽입 실패 : 이미 존재하는 데이터입니다.");
+            System.out.println(">> 이미 존재하는 데이터입니다.");
 
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
@@ -452,7 +461,7 @@ public class project {
             ResultSet rs1 = pstmt1.executeQuery();
 
             if (!rs1.next()) {
-                System.out.println(">> 데이터 삭제 실패 : 학생 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 학생 번호가 존재하지 않습니다.\n");
                 pstmt1.close();
                 return;
             }
@@ -467,7 +476,7 @@ public class project {
             ResultSet rs2 = pstmt2.executeQuery();
 
             if (!rs2.next()) {
-                System.out.println(">> 데이터 삭제 실패 : 프로젝트 번호와 학생 번호가 일치하는 데이터가 존재하지 않습니다.");
+                System.out.print("\n>> 프로젝트 번호와 학생 번호가 일치하는 데이터가 존재하지 않습니다.\n");
                 pstmt1.close();
                 pstmt2.close();
                 return;
@@ -508,7 +517,7 @@ public class project {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 검색 실패 : 학생 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 학생 번호가 존재하지 않습니다.\n");
                 pstmt.close();
                 return;
             }

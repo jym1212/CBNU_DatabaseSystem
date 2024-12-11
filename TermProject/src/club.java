@@ -102,6 +102,36 @@ public class club {
     // 동아리 추가 함수
     public static void insertClub(Connection con, Scanner sc) {
         try {
+            System.out.print("\n담당 교수님 번호 : ");
+            String prof_id = sc.next();
+            String valid_id = null;
+
+            String query1 = "SELECT prof_id FROM Professor WHERE prof_id = ?;";
+            try (PreparedStatement pstmt1 = con.prepareStatement(query1)) {
+                pstmt1.setString(1, prof_id);
+                ResultSet rs1 = pstmt1.executeQuery();
+                if (!rs1.next()) {
+                    System.out.println(">> 데이터 삽입 실패 : 교수님 번호가 존재하지 않습니다.");
+                    pstmt1.close();
+                    return;
+                } else {
+                    valid_id = prof_id;
+                    pstmt1.close();
+                }
+            }
+
+            String query2 = "SELECT * FROM Club WHERE prof_id = ?;";
+            try (PreparedStatement pstmt2 = con.prepareStatement(query2)) {
+                pstmt2.setString(1, valid_id);
+                ResultSet rs = pstmt2.executeQuery();
+                if (rs.next()) {
+                    System.out.println(">> 데이터 삽입 실패 : 교수님께서 이미 다른 동아리를 담당하고 있습니다.");
+                    pstmt2.close();
+                    return;
+                }
+                pstmt2.close();
+            }
+            
             System.out.print("\n동아리 코드 : ");
             int club_id = sc.nextInt();
             System.out.print("동아리 이름 : ");
@@ -110,25 +140,6 @@ public class club {
             int room_num = sc.nextInt();
             System.out.print("동아리 인원 : ");
             int total_num = sc.nextInt();
-
-            System.out.print("교수님 번호 : ");
-            String prof_id = sc.next();
-            String valid_id = null;
-
-            String query = "SELECT prof_id FROM Professor WHERE prof_id = ?;";
-            try (PreparedStatement pstmt = con.prepareStatement(query)) {
-                pstmt.setString(1, prof_id);
-                ResultSet rs = pstmt.executeQuery();
-                if (!rs.next()) {
-                    System.out.println(">> 데이터 삽입 실패 : 교수님 번호가 존재하지 않습니다.");
-                    pstmt.close();
-                    return;
-                }
-                else {
-                    valid_id = prof_id;
-                    pstmt.close();
-                }
-            }
 
             String insertQuery = "INSERT INTO Club (club_id, club_name, room_num, total_num, prof_id) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
@@ -240,8 +251,8 @@ public class club {
             
             String query = "SELECT * FROM Club WHERE club_id = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
-            ResultSet rs = pstmt.executeQuery(query);
-            pstmt.setInt(1, search_club_id);
+            pstmt.setInt(1, search_club_id); 
+            ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
                 System.out.println(">> 해당 동아리 코드가 존재하지 않습니다.");

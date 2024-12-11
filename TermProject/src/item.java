@@ -57,7 +57,7 @@ public class item {
     // 전체 비품 목록 출력
     public static void selectALLItem(Connection con) {
         try {
-            String query = "SELECT * FROM Item ORDER BY item_id, man_id";
+            String query = "SELECT * FROM Item ORDER BY item_id, man_id ASC";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -104,9 +104,44 @@ public class item {
     // 비품 추가 함수
     public static void insertItem(Connection con, Scanner sc) {
         try {
+            String valid_man_id = null;
+            Integer valid_item_id = null;
 
-            System.out.print("\n비품 번호 : ");
+            System.out.print("\n임원 번호 : ");
+            String man_id = sc.next();
+
+            String query1 = "SELECT man_id FROM Manager WHERE man_id = ?;";
+            try (PreparedStatement pstmt1 = con.prepareStatement(query1)) {
+                pstmt1.setString(1, man_id);
+                ResultSet rs1 = pstmt1.executeQuery();
+                if (!rs1.next()) {
+                    System.out.print("\n>> 임원 번호가 존재하지 않습니다.\n");
+                    pstmt1.close();
+                    return;
+                } else {
+                    valid_man_id = man_id;
+                    pstmt1.close();
+                }
+            }
+
+            System.out.print("비품 번호 : ");
             int item_id = sc.nextInt();
+
+            String query2 = "SELECT item_id FROM Item WHERE item_id = ?;";
+            try (PreparedStatement pstmt2 = con.prepareStatement(query2)) {
+                pstmt2.setInt(1, item_id);
+                ResultSet rs2 = pstmt2.executeQuery();
+                if (rs2.next()) {
+                    System.out.print("\n>> 이미 존재하는 비품 번호입니다.\n");
+                    pstmt2.close();
+                    return;
+                }
+                else {
+                    valid_item_id = item_id;
+                    pstmt2.close();
+                }
+            }
+
             System.out.print("비품 이름 : ");
             String item_name = sc.next();
             System.out.print("비품 날짜(YYYY-MM-DD) : ");
@@ -115,39 +150,20 @@ public class item {
             System.out.print("비품 개수 : ");
             int total_num = sc.nextInt();
 
-            System.out.print("임원 번호 : ");
-            String man_id = sc.next();
-            String valid_id = null;
-
-            String query = "SELECT man_id FROM Manager WHERE man_id = ?;";
-            try (PreparedStatement pstmt = con.prepareStatement(query)) {
-                pstmt.setString(1, man_id);
-                ResultSet rs = pstmt.executeQuery();
-                if (!rs.next()) {
-                    System.out.println(">> 데이터 삽입 실패 : 임원 번호가 존재하지 않습니다.");
-                    pstmt.close();
-                    return;
-                } else {
-                    valid_id = man_id;
-                    pstmt.close();
-                }
-            }
+            
 
             String insertQuery = "INSERT INTO Item (item_id, item_name, item_date, total_num, man_id) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
-            insertPstmt.setInt(1, item_id);
+            insertPstmt.setInt(1, valid_item_id);
             insertPstmt.setString(2, item_name);
             insertPstmt.setDate(3, sql_date);
             insertPstmt.setInt(4, total_num);
-            insertPstmt.setString(5, valid_id);
+            insertPstmt.setString(5, valid_man_id);
 
             insertPstmt.executeUpdate();
             System.out.println(">> Item 테이블에 데이터를 성공적으로 삽입했습니다.");
 
             insertPstmt.close();
-
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println(">> 데이터 삽입 실패 : 비품 번호가 이미 존재합니다.");
 
         } catch (SQLSyntaxErrorException e) {
             System.out.println(">> SQL 문법 오류 : " + e.getMessage());
@@ -172,7 +188,7 @@ public class item {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 수정 실패 : 해당 비품 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 비품 번호가 존재하지 않습니다.\n");
                 return;
             }
 
@@ -217,7 +233,7 @@ public class item {
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
-                System.out.println(">> 데이터 삭제 실패 : 해당 비품 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 비품 번호가 존재하지 않습니다.\n");
                 return;
             }
 
@@ -251,7 +267,7 @@ public class item {
             ResultSet rs = pstmt.executeQuery();
 
             if(!rs.next()){
-                System.out.println(">> 데이터 검색 실패 : 해당 비품 번호가 존재하지 않습니다.");
+                System.out.print("\n>> 해당 비품 번호가 존재하지 않습니다.\n");
                 return;
             }   
 
